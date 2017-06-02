@@ -158,8 +158,12 @@ export default {
       }
     );*/
     let _this = this;
-    let centerChangedEvent = qq.maps.event.addListener(map, 'center_changed', function(event) {
-        _this.userSelectMarker.setPosition(event.target.center);
+    let centerChangedEvent = qq.maps.event.addListener(map, 'dragend', function() {
+        console.log(route_lines);
+        _this.userSelectMarker.setPosition(map.getCenter());
+    });
+    let clickMapEvent = qq.maps.event.addListener(map, 'click', function() {
+        _this.clearOverlay(route_lines);
     });
   },
   methods:{
@@ -249,18 +253,14 @@ export default {
       }
     },
     calcRoute : function(lat,lng){
-      // let start_lat = this.userSelectMarker.lat;
-      // let start_lng = this.userSelectMarker.lng;
-      // let stop_lat  = lat;
-      // let stop_lng  = lng;
 
       //清除所有路线
       this.clearOverlay(route_lines);
 
-      var start_lat = map.getCenter().lat;
-      var start_lng = map.getCenter().lng;
-      var stop_lat  = lat;
-      var stop_lng  = lng;
+      let start_lat = this.userSelectMarker.getPosition().lat;
+      let start_lng = this.userSelectMarker.getPosition().lng;
+      let stop_lat  = lat;
+      let stop_lng  = lng;
 
       let policy = 'LEAST_TIME'; //LEAST_DISTANCE,AVOID_HIGHWAYS,REAL_TRAFFIC,PREDICT_TRAFFIC
       route_steps = [];
