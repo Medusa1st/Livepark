@@ -1,14 +1,19 @@
 <template>
 <div>
     <div id="container">
-      <div id="search-box">
-      <input id="address" type="text" @keyup.enter="codeAddress()" v-model="searchAddress" placeholder="请输入地址关键字">
-      <button @click="codeAddress()">search</button>
-      <button @click="getCenter()">center</button>
+<!--       <div id="title-box">
+        <p>城市乐泊</p>
+      </div> -->
+      <div id="main-box" v-bind:style="{backgroundColor:mainButtonBgColor, color:mainButtonTextColor}">
+        <p>{{mainButtonText}}</p>
+      </div>
+      <div id="tools-box">
+        <img id="aimCenter" src="~assets/aim-center.png" @click="getCenter()">
       </div>
       <div id="centerMarker" v-bind:style="{top:calcTop + 'px',left:calcLeft + 'px'}">
       <img src="~assets/pin-red.png"
-           v-bind:style="{width:centerMarkerWidth + 'px',height:centerMarkerHeight + 'px'}"/>
+           v-bind:style="{width:centerMarkerWidth + 'px',height:centerMarkerHeight + 'px'}"
+           v-show="isCenterMarkerShow"/>         
       </div>
       <div style="width:603px;padding-top:5px;;padding-left:5px;position:absolute;z-index:10000" id="routes"></div>
     </div>
@@ -24,6 +29,9 @@ export default {
   name: 'app',
   data(){
     return {
+      mainButtonBgColor: '#fff',
+      mainButtonTextColor: '#000',
+      mainButtonText: '选择地点',
       geocoder: null, 
       // map: null, 
       marker: null,
@@ -32,7 +40,8 @@ export default {
       centerMarkerWidth: 48,
       centerMarkerHeight: 48,
       calcTop: null,
-      calcLeft: null,     
+      calcLeft: null,
+      isCenterMarkerShow: false,     
       //window onload map center
       onLoadCenter: {lat: '31.305468476254635', lng: '121.50784492492676'},
       //navigator start position
@@ -42,9 +51,17 @@ export default {
       parkGPSList: [
         {lat: '31.308071816223425',lng: '121.5029525756836' },
         {lat: '31.308035149962773',lng: '121.51102066040039'},
-        {lat: '31.3022783700433'  ,lng: '121.50629997253418'},
-        {lat: '31.304368451830978',lng: '121.51320934295654'}
-        // {lat: '31.305468476254635',lng: '121.50784492492676'}
+        {lat: '31.3022783700433',  lng: '121.50629997253418'},
+        {lat: '31.304368451830978',lng: '121.51320934295654'},
+        {lat: '31.293844235737975',lng: '121.50381088256836'},
+        {lat: '31.31512980559464', lng: '121.51196479797363'},
+        {lat: '31.309758448785676',lng: '121.52020454406738'},
+        {lat: '31.31555143497141', lng: '121.49660110473633'},
+        {lat: '31.282291914094',   lng: '121.51651382446289'},
+        {lat: '31.373718178573974',lng: '121.44235610961914'},
+        {lat: '31.258229203122266',lng: '121.57153129577637'},
+        {lat: '31.16566270170272', lng: '121.33901596069336'},
+        {lat: '31.30805348309488', lng: '121.48733139038086'}
       ],
       userSelectMarker: null,
       directionsService : new qq.maps.DrivingService({
@@ -139,8 +156,12 @@ export default {
 
     //定义map变量 调用 qq.maps.Map() 构造函数   获取地图显示容器
     map = new window.qq.maps.Map(document.getElementById("container"), {
-        center: new window.qq.maps.LatLng(this.onLoadCenter.lat, this.onLoadCenter.lng),      // 地图的中心地理坐标。
-        zoom:15                                              // 地图的中心地理坐标。
+        // 地图的中心地理坐标。
+        center: new window.qq.maps.LatLng(this.onLoadCenter.lat, this.onLoadCenter.lng),  
+        // 地图的中心地理坐标。   
+        zoom:15,
+        mapTypeControl: false,
+        zoomControl: false
     });
     //地址和经纬度之间进行转换服务
     //经度 Longitude
@@ -158,12 +179,24 @@ export default {
       }
     );*/
     let _this = this;
-    let centerChangedEvent = qq.maps.event.addListener(map, 'dragend', function() {
-        console.log(route_lines);
-        _this.userSelectMarker.setPosition(map.getCenter());
+    let dragStartEvent = qq.maps.event.addListener(map, 'dragstart', function() {
+        if(route_lines.length === 0){
+          _this.isCenterMarkerShow=true;
+          _this.userSelectMarker.setVisible(false);
+        }
     });
-    let clickMapEvent = qq.maps.event.addListener(map, 'click', function() {
+    let dragEndEvent = qq.maps.event.addListener(map, 'dragend', function() {
+        if(route_lines.length === 0){
+          _this.userSelectMarker.setPosition(map.getCenter());
+        }
+    });
+    let clickMapEvent = qq.maps.event.addListener(map, 'click', function(event) {
         _this.clearOverlay(route_lines);
+        _this.mainButtonBgColor = '#fff';
+        _this.mainButtonTextColor = '#000';
+        _this.mainButtonText = '选择地点';
+        // alert('您点击的位置为:[' + '纬度' + event.latLng.getLat() + ','
+        //                          + '经度' + event.latLng.getLng() + ']');
     });
   },
   methods:{
@@ -190,10 +223,16 @@ export default {
         });
     },
     getCenter : function(){
-      alert("latlng:" + map.getCenter());
-    },
-    getCenterTop : function(){
-      return "100px";
+      this.clearOverlay(route_lines);
+      this.mainButtonBgColor = '#fff';
+      this.mainButtonTextColor = '#000';
+      this.mainButtonText = '选择地点';
+      let center = new window.qq.maps.LatLng(this.onLoadCenter.lat, this.onLoadCenter.lng);
+      map.setCenter(center);
+      this.isCenterMarkerShow = false;
+      this.userSelectMarker.setPosition(center);
+      this.userSelectMarker.setVisible(true);
+      map.zoomTo(15);
     },
     //添加标记
     addUserGPSMarker : function(lat,lng){
@@ -242,7 +281,12 @@ export default {
       let markerIndex = this.markersArray.length;
       let _this = this;
       qq.maps.event.addListener(marker, 'click', function() {
+          _this.userSelectMarker.setVisible(true);
+          _this.isCenterMarkerShow = false;
           _this.calcRoute(lat,lng);
+          _this.mainButtonBgColor = 'limegreen';
+          _this.mainButtonTextColor = '#FFF';
+          _this.mainButtonText = '前往停车';
       });
     },
     //清除地图上的marker
@@ -272,36 +316,16 @@ export default {
     }
   }
 }
-
 </script>
 
 <style>
-*{
-    margin:0px;
-    padding:0px;
-}
-body{
-    width:100%;
-    height:100%;
-}
-#container{
-    width:100vw;
-    height: 100vh;
-}
-#search-box{
-  position: absolute;
-  z-index: 10000;
-  top:6px;
-  left: 10px;
-  font-size: 17px;
-}
-
-#centerMarker{
-  position: absolute;
-  z-index: 10000;
-}
-
-#routes{
-  font-size: 6px;
-}
+*{margin:0px; padding:0px;}
+body{width:100%; height:100%;}
+#aimCenter{width: 45px; height: 45px;}
+#container{width:100vw; height: 100vh;}
+#title-box{width:100%; height: 32px; line-height:32px; text-align: center; position: absolute; z-index: 10000; font-size: 17px;background-color: #000; color: #fff;}
+#main-box{width: 150px;height: 35px; line-height:35px; position: absolute; z-index: 10000; bottom:28px; left: 50%; margin-left: -75px; font-size: 15px;text-align: center; border: 2px solid limegreen;border-radius: 20px}
+#tools-box{position: absolute; z-index: 10000; bottom:23px;right: 10px; font-size: 17px;}
+#centerMarker{position: absolute; z-index: 10000;}
+#routes{font-size: 6px;}
 </style>
