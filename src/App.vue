@@ -8,7 +8,10 @@
         <p>{{mainButtonText}}</p>
       </div>
       <div id="tools-box">
-        <img id="aimCenter" src="~assets/aim-center.png" @click="getCenter()">
+        <img src="~assets/aim-center.png" @click="getCenter()">
+      </div>
+      <div id="settings-box">
+        <img src="~assets/settings.png" @click="getCenter()">
       </div>
       <div id="centerMarker" v-bind:style="{top:calcTop + 'px',left:calcLeft + 'px'}">
       <img src="~assets/pin-red.png"
@@ -321,11 +324,13 @@ export default {
 <style>
 *{margin:0px; padding:0px;}
 body{width:100%; height:100%;}
-#aimCenter{width: 45px; height: 45px;}
 #container{width:100vw; height: 100vh;}
 #title-box{width:100%; height: 32px; line-height:32px; text-align: center; position: absolute; z-index: 10000; font-size: 17px;background-color: #000; color: #fff;}
 #main-box{width: 150px;height: 35px; line-height:35px; position: absolute; z-index: 10000; bottom:28px; left: 50%; margin-left: -75px; font-size: 15px;text-align: center; border: 2px solid limegreen;border-radius: 20px}
 #tools-box{position: absolute; z-index: 10000; bottom:23px;right: 10px; font-size: 17px;}
+#tools-box img{width: 45px; height: 45px;}
+#settings-box{position: absolute; z-index: 10000; bottom:23px;left: 10px; font-size: 17px;}
+#settings-box img{width: 45px; height: 45px;}
 #centerMarker{position: absolute; z-index: 10000;}
 #routes{font-size: 6px;}
 </style>
