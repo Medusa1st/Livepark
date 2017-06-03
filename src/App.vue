@@ -1,24 +1,28 @@
 <template>
 <div>
-    <div id="container">
-<!--       <div id="title-box">
-        <p>城市乐泊</p>
-      </div> -->
+    <div id="container" @click="settingsPageStyleLeft='-80%'">
       <div id="main-box" v-bind:style="{backgroundColor:mainButtonBgColor, color:mainButtonTextColor}">
         <p>{{mainButtonText}}</p>
       </div>
       <div id="tools-box">
-        <img src="~assets/aim-center.png" @click="getCenter()">
+        <img src="~assets/aim-center.png" @click="getCenter">
       </div>
       <div id="settings-box">
-        <img src="~assets/settings.png" @click="getCenter()">
+        <img src="~assets/settings.png" @click="getSettings">
       </div>
       <div id="centerMarker" v-bind:style="{top:calcTop + 'px',left:calcLeft + 'px'}">
-      <img src="~assets/pin-red.png"
+            <img src="~assets/pin-red.png"
            v-bind:style="{width:centerMarkerWidth + 'px',height:centerMarkerHeight + 'px'}"
            v-show="isCenterMarkerShow"/>         
       </div>
-      <div style="width:603px;padding-top:5px;;padding-left:5px;position:absolute;z-index:10000" id="routes"></div>
+      <!-- <div style="width:603px;padding-top:5px;;padding-left:5px;position:absolute;z-index:10000" id="routes"></div> -->
+    </div>
+    <div id="settings-page" v-bind:style="{left: settingsPageStyleLeft}">
+      <div style="width:100px;height:100px;margin:50px auto;border-radius:50px;overflow:hidden;">
+        <img src="~assets/profile-photo.png" style="width:100%;height:100%;">
+      </div>
+      <div class="settings-page-button">个人资料</div>
+      <div class="settings-page-button">停车记录</div>
     </div>
 </div>
 </template>
@@ -44,11 +48,12 @@ export default {
       centerMarkerHeight: 48,
       calcTop: null,
       calcLeft: null,
-      isCenterMarkerShow: false,     
+      isCenterMarkerShow: false, 
+      settingsPageStyleLeft: '-80%',
+      isSettingsPageShow: false,
       //window onload map center
       onLoadCenter: {lat: '31.305468476254635', lng: '121.50784492492676'},
       //navigator start position
-      // navStartPos: {lat: onLoadCenter.lat, lng: onLoadCenter.lng},
       navStartPos: null,
       //Gps List
       parkGPSList: [
@@ -203,27 +208,10 @@ export default {
     });
   },
   methods:{
-    codeAddress : function(){
-        let address = document.getElementById("address").value;
-        //对指定地址进行解析
-        this.geocoder.getLocation("上海"+address);
-        //设置服务请求成功的回调函数
-        this.geocoder.setComplete(function(result) {
-            map.setCenter(result.detail.location);
-            let marker = new qq.maps.Marker({
-                map: map,
-                position: result.detail.location
-            });
-            map.zoomTo(14);
-            //点击Marker会弹出反查结果
-            qq.maps.event.addListener(marker, 'click', function() {
-                alert("坐标地址为： " + result.detail.location);
-            });
-        });
-        //若服务请求失败，则运行以下函数
-        this.geocoder.setError(function() {
-            alert("出错了，请输入正确的地址！！！");
-        });
+    getSettings : function(event){
+      event.stopPropagation();
+      this.settingsPageStyleLeft = 0;
+      this.isSettingsPageShow = true;
     },
     getCenter : function(){
       this.clearOverlay(route_lines);
@@ -325,12 +313,13 @@ export default {
 *{margin:0px; padding:0px;}
 body{width:100%; height:100%;}
 #container{width:100vw; height: 100vh;}
-#title-box{width:100%; height: 32px; line-height:32px; text-align: center; position: absolute; z-index: 10000; font-size: 17px;background-color: #000; color: #fff;}
-#main-box{width: 150px;height: 35px; line-height:35px; position: absolute; z-index: 10000; bottom:28px; left: 50%; margin-left: -75px; font-size: 15px;text-align: center; border: 2px solid limegreen;border-radius: 20px}
-#tools-box{position: absolute; z-index: 10000; bottom:23px;right: 10px; font-size: 17px;}
+#main-box{width: 150px;height: 35px; line-height:35px; position: absolute; z-index: 10; bottom:28px; left: 50%; margin-left: -75px; font-size: 15px;text-align: center; border: 2px solid limegreen;border-radius: 20px}
+#tools-box{position: absolute; z-index: 10; bottom:23px;right: 15px; font-size: 17px;}
 #tools-box img{width: 45px; height: 45px;}
-#settings-box{position: absolute; z-index: 10000; bottom:23px;left: 10px; font-size: 17px;}
-#settings-box img{width: 45px; height: 45px;}
-#centerMarker{position: absolute; z-index: 10000;}
+#settings-box{position: absolute; z-index: 10; bottom:23px;left: 15px; font-size: 17px;}
+#settings-box img{width: 40px; height: 39px;}
+#settings-page{width:80%; height: 100%; position: absolute; z-index: 100; top:0px; font-size: 17px;background-color: #efefef; transition: left 0.2s linear; border-radius: 10px}
+#centerMarker{position: absolute; z-index: 10;}
 #routes{font-size: 6px;}
+.settings-page-button{width:90%;height:50px;border-top:1px solid limegreen;border-bottom:1px solid limegreen;margin:20px auto;text-align:center;line-height:50px;}
 </style>
