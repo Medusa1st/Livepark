@@ -1,6 +1,6 @@
 <template>
 <div>
-    <div id="container" @click="settingsPageStyleLeft='-80%'">
+    <div id="container" @click="settingsPageStyleLeft='-80%';isCurtainShow=false">
       <div id="main-box" v-bind:style="{backgroundColor:mainButtonBgColor, color:mainButtonTextColor}">
         <p>{{mainButtonText}}</p>
       </div>
@@ -15,6 +15,9 @@
            v-bind:style="{width:centerMarkerWidth + 'px',height:centerMarkerHeight + 'px'}"
            v-show="isCenterMarkerShow"/>         
       </div>
+      <transition name="fade">
+        <div id="curtain" v-show="isCurtainShow"></div>
+      </transition>
       <!-- <div style="width:603px;padding-top:5px;;padding-left:5px;position:absolute;z-index:10000" id="routes"></div> -->
     </div>
     <div id="settings-page" v-bind:style="{left: settingsPageStyleLeft}">
@@ -28,7 +31,7 @@
 </template>
 
 <script>
-let map, directions_routes, directions_placemarks=[], route_lines=[], route_steps=[];
+let map, directions_routes, directions_placemarks=[], route_lines=[], route_steps=[],hammer;
 const pinGreenSolid = require('./assets/pin-green-solid.png');
 const pinBlueSolid = require('./assets/pin-blue-solid.png');
 const pinRed = require('./assets/pin-red.png');
@@ -50,7 +53,7 @@ export default {
       calcLeft: null,
       isCenterMarkerShow: false, 
       settingsPageStyleLeft: '-80%',
-      isSettingsPageShow: false,
+      isCurtainShow: false,
       //window onload map center
       onLoadCenter: {lat: '31.305468476254635', lng: '121.50784492492676'},
       //navigator start position
@@ -162,6 +165,8 @@ export default {
     this.calcLeft= this.$el.clientWidth/2 - this.centerMarkerWidth/2;
     this.navStartPos = this.onLoadCenter;
 
+    hammer = new Hammer(document.getElementById("container"));
+
     //定义map变量 调用 qq.maps.Map() 构造函数   获取地图显示容器
     map = new window.qq.maps.Map(document.getElementById("container"), {
         // 地图的中心地理坐标。
@@ -206,12 +211,18 @@ export default {
         // alert('您点击的位置为:[' + '纬度' + event.latLng.getLat() + ','
         //                          + '经度' + event.latLng.getLng() + ']');
     });
+
+    hammer.add(new Hammer.Pinch());
+    hammer.on('pinch', function(e) {
+      e.preventDefault();
+      map.setCenter(new window.qq.maps.LatLng(31.305468476254635, 121.50784492492676));
+    });
   },
   methods:{
     getSettings : function(event){
       event.stopPropagation();
       this.settingsPageStyleLeft = 0;
-      this.isSettingsPageShow = true;
+      this.isCurtainShow=true;
     },
     getCenter : function(){
       this.clearOverlay(route_lines);
@@ -223,7 +234,7 @@ export default {
       this.isCenterMarkerShow = false;
       this.userSelectMarker.setPosition(center);
       this.userSelectMarker.setVisible(true);
-      map.zoomTo(15);
+      // map.zoomTo(15);
     },
     //添加标记
     addUserGPSMarker : function(lat,lng){
@@ -318,8 +329,11 @@ body{width:100%; height:100%;}
 #tools-box img{width: 45px; height: 45px;}
 #settings-box{position: absolute; z-index: 10; bottom:23px;left: 15px; font-size: 17px;}
 #settings-box img{width: 40px; height: 39px;}
-#settings-page{width:80%; height: 100%; position: absolute; z-index: 100; top:0px; font-size: 17px;background-color: #efefef; transition: left 0.2s linear; border-radius: 10px}
+#settings-page{width:80%; height: 100%; position: absolute; z-index: 100; top:0px; font-size: 17px;background-color: #efefef; transition: left .2s linear; border-radius: 10px}
 #centerMarker{position: absolute; z-index: 10;}
 #routes{font-size: 6px;}
 .settings-page-button{width:90%;height:50px;border-top:1px solid limegreen;border-bottom:1px solid limegreen;margin:20px auto;text-align:center;line-height:50px;}
+#curtain{width:100%; height: 100%; position: absolute; z-index: 50; background-color:#000; opacity:0.5;}
+#curtain.fade-enter-active, #curtain.fade-leave-active{transition: opacity .5s;}
+#curtain.fade-enter, #curtain.fade-leave-active{opacity: 0;}
 </style>
