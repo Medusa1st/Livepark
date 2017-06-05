@@ -1,6 +1,7 @@
 <template>
 <div>
     <div id="container" @click="settingsPageStyleLeft='-80%';isCurtainShow=false">
+      <div id="map-box"></div>
       <div id="main-box" v-bind:style="{backgroundColor:mainButtonBgColor, color:mainButtonTextColor}">
         <p>{{mainButtonText}}</p>
       </div>
@@ -31,7 +32,7 @@
 </template>
 
 <script>
-let map, directions_routes, directions_placemarks=[], route_lines=[], route_steps=[],hammer;
+let map, directions_routes, directions_placemarks=[], route_lines=[], route_steps=[];
 const pinGreenSolid = require('./assets/pin-green-solid.png');
 const pinBlueSolid = require('./assets/pin-blue-solid.png');
 const pinRed = require('./assets/pin-red.png');
@@ -165,10 +166,8 @@ export default {
     this.calcLeft= this.$el.clientWidth/2 - this.centerMarkerWidth/2;
     this.navStartPos = this.onLoadCenter;
 
-    hammer = new Hammer(document.getElementById("container"));
-
     //定义map变量 调用 qq.maps.Map() 构造函数   获取地图显示容器
-    map = new window.qq.maps.Map(document.getElementById("container"), {
+    map = new window.qq.maps.Map(document.getElementById("map-box"), {
         // 地图的中心地理坐标。
         center: new window.qq.maps.LatLng(this.onLoadCenter.lat, this.onLoadCenter.lng),  
         // 地图的中心地理坐标。   
@@ -210,12 +209,6 @@ export default {
         _this.mainButtonText = '选择地点';
         // alert('您点击的位置为:[' + '纬度' + event.latLng.getLat() + ','
         //                          + '经度' + event.latLng.getLng() + ']');
-    });
-
-    hammer.add(new Hammer.Pinch());
-    hammer.on('pinch', function(e) {
-      e.preventDefault();
-      map.setCenter(new window.qq.maps.LatLng(31.305468476254635, 121.50784492492676));
     });
   },
   methods:{
@@ -323,7 +316,8 @@ export default {
 <style>
 *{margin:0px; padding:0px;}
 body{width:100%; height:100%;}
-#container{width:100vw; height: 100vh;}
+/*#container{width:100vw; height: 100vh;}*/
+#map-box{width:100vw; height: 100vh; z-index: 1;}
 #main-box{width: 150px;height: 35px; line-height:35px; position: absolute; z-index: 10; bottom:28px; left: 50%; margin-left: -75px; font-size: 15px;text-align: center; border: 2px solid limegreen;border-radius: 20px}
 #tools-box{position: absolute; z-index: 10; bottom:23px;right: 15px; font-size: 17px;}
 #tools-box img{width: 45px; height: 45px;}
@@ -333,7 +327,9 @@ body{width:100%; height:100%;}
 #centerMarker{position: absolute; z-index: 10;}
 #routes{font-size: 6px;}
 .settings-page-button{width:90%;height:50px;border-top:1px solid limegreen;border-bottom:1px solid limegreen;margin:20px auto;text-align:center;line-height:50px;}
-#curtain{width:100%; height: 100%; position: absolute; z-index: 50; background-color:#000; opacity:0.5;}
+#curtain{width:100%; height: 100%; position: absolute; top:0px; left: 0px; z-index: 50; background-color:#000; opacity:0.5;}
 #curtain.fade-enter-active, #curtain.fade-leave-active{transition: opacity .5s;}
 #curtain.fade-enter, #curtain.fade-leave-active{opacity: 0;}
+
+#cover{width:100%; height: 100%; position: absolute; top:0px; left: 0px; z-index: 5;}
 </style>
