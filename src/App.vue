@@ -1,18 +1,18 @@
 <template>
 <div>
-    <div id="container" @click="settingsPageStyleLeft='-80%';isCurtainShow=false">
+    <div id="container" @click="settingsPageStyleLeft='-83%';isCurtainShow=false">
       <div id="map-box"></div>
       <div id="main-box" v-bind:style="{backgroundColor:mainButtonBgColor, color:mainButtonTextColor}" @click="functionTBD">
         <p>{{mainButtonText}}</p>
       </div>
       <div id="tools-box">
-        <img src="~assets/aim-center.png" @click="getCenter">
+        <img v-bind:src="aimCenterPic" @click="getCenter">
       </div>
       <div id="settings-box">
-        <img src="~assets/settings.png" @click="getSettings">
+        <img v-bind:src="settingsBoxPic" @click="getSettings">
       </div>
       <div id="centerMarker" v-bind:style="{top:calcTop + 'px',left:calcLeft + 'px'}">
-            <img src="~assets/pin-red.png"
+            <img v-bind:src="centerMarkerPic"
            v-bind:style="{width:centerMarkerWidth + 'px',height:centerMarkerHeight + 'px'}"
            v-show="isCenterMarkerShow"/>         
       </div>
@@ -23,17 +23,17 @@
     </div>
     <div id="settings-page" v-bind:style="{left: settingsPageStyleLeft}">
       <div style="width:100px;height:100px;margin:50px auto;border-radius:50px;overflow:hidden;">
-        <img src="~assets/profile-photo.png" style="width:100%;height:100%;">
+        <img v-bind:src="profilePhotoPic" style="width:100%;height:100%;">
       </div>
       <div class="settings-page-button" @click="functionTBD">
-        <img class="indicated-pic-profile" src="~assets/profile.png">
+        <img class="indicated-pic-profile" v-bind:src="profilePic">
         <div class="content-message">个人资料</div>
-        <img class="goto-pic" src="~assets/go-to-arrow.png">
+        <img class="goto-pic" v-bind:src="goToArrowPic">
       </div>
       <div class="settings-page-button" @click="functionTBD">
-        <img class="indicated-pic-record" src="~assets/record.png">
+        <img class="indicated-pic-record" v-bind:src="recordPic">
         <div class="content-message">停车记录</div>
-        <img class="goto-pic" src="~assets/go-to-arrow.png">
+        <img class="goto-pic" v-bind:src="goToArrowPic">
       </div>
     </div>
 </div>
@@ -44,10 +44,24 @@ let map, directions_routes, directions_placemarks=[], route_lines=[], route_step
 const pinGreenSolid = require('./assets/pin-green-solid.png');
 const pinBlueSolid = require('./assets/pin-blue-solid.png');
 const pinRed = require('./assets/pin-red.png');
+const aimCenter = require('./assets/aim-center.png');
+const settingsBox = require('./assets/settings.png');
+const profilePhoto = require('./assets/profile-photo.png');
+const profile = require('./assets/profile.png');
+const record = require('./assets/record.png');
+const goToArrow = require('./assets/go-to-arrow.png');
+
 export default {
   name: 'app',
   data(){
     return {
+      aimCenterPic: aimCenter,
+      settingsBoxPic: settingsBox,
+      profilePhotoPic: profilePhoto,
+      profilePic: profile,
+      recordPic: record,
+      goToArrowPic: goToArrow,
+      centerMarkerPic: pinRed,
       mainButtonBgColor: '#fff',
       mainButtonTextColor: '#000',
       mainButtonText: '选择地点',
@@ -61,7 +75,7 @@ export default {
       calcTop: null,
       calcLeft: null,
       isCenterMarkerShow: false, 
-      settingsPageStyleLeft: '-80%',
+      settingsPageStyleLeft: '-83%',
       isCurtainShow: false,
       //window onload map center
       onLoadCenter: {lat: '31.305468476254635', lng: '121.50784492492676'},
