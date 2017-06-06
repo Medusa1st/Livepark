@@ -1,0 +1,126 @@
+@keyframes where-is-origin
+  0%
+    transform: rotateZ(360deg)
+  100%
+    transform: rotateZ(0deg)
+
+@keyframes titlea-foriOS
+  0%, 100%, 60%, 75%, 90%
+    transition-timing-function: cubic-bezier(0.215, .61, .355, 1)
+  0%
+    opacity: 0
+    transform: translate3d(0, -3000px, 0) scale3d(1, 1, 1)
+  40%
+    opacity: 1
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1)
+  50%
+    opacity: 1
+    transform: translate3d(0, 0, 0) scale3d(1.25, .75, 1)
+  60%
+    opacity: 1
+    transform: translate3d(0, 0, 0) scale3d(.75, 1.25, 1)
+  70%
+    opacity: 1
+    transform: translate3d(0, 0, 0) scale3d(1.15, .85, 1)
+  80%
+    opacity: 1
+    transform: translate3d(0, 0, 0) scale3d(.95, 1.05, 1)
+  90%
+    opacity: 1
+    transform: translate3d(0, 0, 0) scale3d(1.05, .95, 1)
+  100%
+    opacity: 1
+    transform: none
+
+@keyframes cloud-moveing
+  0%
+    background-position-x: 0
+  100%
+    background-position-x: r(750)
+
+@keyframes sway-redbags
+  0%, 80%
+    opacity: 1
+    transform: rotateZ(0deg) scale(1)
+  4%, 20%, 36%, 52%, 68%
+    opacity: 1
+    transform: rotateZ(10deg) scale(1)
+  12%, 28%, 44%, 60%, 72%
+    opacity: 1
+    transform: rotateZ(-10deg) scale(1)
+  90%
+    opacity: 1
+    transform: rotateZ(0deg) scale(.25)
+  100%
+    opacity: 0
+    display: none
+    transform: rotateZ(0deg) scale(.5)
+
+@keyframes show-prize
+  0%
+    opacity: 0
+    transform: scale(.5)
+  100%
+    opacity: 1
+    transform: scale(1)
+
+@keyframes hen-toleft
+  0%
+    transform: translate3d(70%, 0, 0)
+  100%
+    transform: translate3d(0, 0, 0)
+
+@keyframes sway-hen
+  0%
+    transform: rotateZ(0deg)
+  25%
+    transform: rotateZ(30deg)
+  75%
+    transform: rotateZ(-30deg)
+  100%
+    transform: rotateZ(0deg)
+
+@keyframes prize-out
+  0%
+    z-index: 10
+    transform: translate3d(0, 0, 0) scale(.84)
+  60%
+    z-index: 10
+    transform: translate3d(0, -60%, 0) scale(.8)
+  61%
+    z-index: 12
+    transform: translate3d(0, -60%, 0) scale(.8)
+  90%
+    z-index: 12
+    transform: translate3d(0, 10%, 0) scale(1)
+  100%
+    z-index: 12
+    transform: translate3d(0, 0, 0) scale(1)
+
+@keyframes caidai-1
+  0%
+    opacity: .8
+    transform: translate3d(30%, 30%, 0)
+  100%
+    opacity: 1
+    transform: translate3d(-10%, -10%, 0)
+
+@keyframes caidai-2
+  0%
+    opacity: .8
+    transform: translate3d(-30%, 30%, 0)
+  100%
+    opacity: 1
+    transform: translate3d(10%, -10%, 0)
+
+@keyframes shake
+  0%, 100%
+    transform: scale3d(0.9, 0.9, 0.9)
+  50%
+    transform: scale3d(1.05, 1.05, 1.05)
+
+@keyframes prize-btn
+  0%
+    opacity: 0
+  100%
+    opacity: 1

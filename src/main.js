@@ -11,3 +11,5 @@ new Vue({
   template: '<App/>',
   components: { App }
 })
+
+document.querySelector('html').style.fontSize = `${Math.min(document.body.clientWidth, document.body.clientHeight) / 375 * 16}px`

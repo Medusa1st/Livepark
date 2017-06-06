@@ -2,16 +2,16 @@
 <div>
     <div id="container" @click="settingsPageStyleLeft='-83%';isCurtainShow=false">
       <div id="map-box"></div>
-      <div id="main-box" v-bind:style="{backgroundColor:mainButtonBgColor, color:mainButtonTextColor}" @click="functionTBD">
+      <div id="main-box" class="items-on-map" v-bind:style="{backgroundColor:mainButtonBgColor, color:mainButtonTextColor}" @click="functionTBD">
         <p>{{mainButtonText}}</p>
       </div>
-      <div id="tools-box">
+      <div id="tools-box" class="items-on-map">
         <img v-bind:src="aimCenterPic" @click="getCenter">
       </div>
-      <div id="settings-box">
+      <div id="settings-box" class="items-on-map">
         <img v-bind:src="settingsBoxPic" @click="getSettings">
       </div>
-      <div id="centerMarker" v-bind:style="{top:calcTop + 'px',left:calcLeft + 'px'}">
+      <div id="centerMarker" class="items-on-map" v-bind:style="{top:calcTop + 'px',left:calcLeft + 'px'}">
             <img v-bind:src="centerMarkerPic"
            v-bind:style="{width:centerMarkerWidth + 'px',height:centerMarkerHeight + 'px'}"
            v-show="isCenterMarkerShow"/>         
@@ -22,7 +22,7 @@
       <!-- <div style="width:603px;padding-top:5px;;padding-left:5px;position:absolute;z-index:10000" id="routes"></div> -->
     </div>
     <div id="settings-page" v-bind:style="{left: settingsPageStyleLeft}">
-      <div style="width:100px;height:100px;margin:50px auto;border-radius:50px;overflow:hidden;">
+      <div class="profile-photo-box">
         <img v-bind:src="profilePhotoPic" style="width:100%;height:100%;">
       </div>
       <div class="settings-page-button" @click="functionTBD">
@@ -338,30 +338,29 @@ export default {
 }
 </script>
 
-<style>
-*{margin:0px; padding:0px;}
+<style lang="scss">
+*{margin:0; padding:0;}
 body{width:100%; height:100%;}
-/*#container{width:100vw; height: 100vh;}*/
 #map-box{width:100vw; height: 100vh; z-index: 1;}
-#centerMarker{position: absolute; z-index: 10;}
-#routes{font-size: 6px;}
+.items-on-map{position: absolute; z-index: 10;}
+/*#routes{font-size: 0.375rem;}*/
 
-#main-box{width: 150px;height: 35px; line-height:35px; position: absolute; z-index: 10; bottom:28px; left: 50%; margin-left: -75px; font-size: 15px;text-align: center; border: 2px solid limegreen;border-radius: 20px}
-#tools-box{position: absolute; z-index: 10; bottom:23px;right: 15px; font-size: 17px;}
-#tools-box img{width: 45px; height: 45px;}
+#main-box{width: 10rem;height: 2.1875rem; line-height: 2.1875rem; bottom: 1.75rem; left: 50%; margin-left: -5rem; font-size: 0.9375rem; text-align: center; border: 2px solid limegreen;border-radius: 1.25rem;}
+#tools-box{bottom: 1.4375rem; right: 0.9375rem;}
+#tools-box img{width: 2.8125rem; height: 2.8125rem;}
 
-#settings-box{position: absolute; z-index: 10; bottom:23px;left: 15px; font-size: 17px;}
-#settings-box img{width: 40px; height: 39px;}
+#settings-box{bottom: 1.4375rem; left: 0.9375rem;}
+#settings-box img{width: 2.5rem; height: 2.5rem;}
 
-#settings-page{width:80%; height: 100%; padding-left: 10px; position: absolute; z-index: 100; top:0px; font-size: 17px;background-color: #efefef; transition: left .2s linear; border-radius: 10px}
-.settings-page-button{width:90%;height:50px;border-top:1px solid limegreen;border-bottom:1px solid limegreen;margin:20px auto;line-height: 50px; display: flex; align-items: center;}
-.settings-page-button img:first-child{padding: 0 10px; width: 25px; height: 25px;}
+#settings-page{width:80%; height: 100%; padding-left: 0.625rem; position: absolute; z-index: 100; top:0; font-size: 1.0625rem;background-color: #efefef; transition: left .2s linear; border-radius: 0.625rem}
+.settings-page-button{width: 90%; height: 3.125rem; border-top:1px solid limegreen;border-bottom:1px solid limegreen; margin:1.25rem auto;line-height: 3.125rem; display: flex; align-items: center;}
+.settings-page-button img:first-child{padding: 0 0.625rem; width: 1.5625rem; height: 1.5625rem;}
 .settings-page-button .content-message{width:80%;}
-.settings-page-button .goto-pic{width: 8px; height: 14px; float: right;padding: 0 10px;}
+.settings-page-button .goto-pic{width: 0.5rem; height: 0.875rem; float: right; padding: 0 0.625rem;}
 
-#curtain{width:100%; height: 100%; position: absolute; top:0px; left: 0px; z-index: 50; background-color:#000; opacity:0.5;}
+.profile-photo-box{width:6.25rem;height:6.25rem;margin:3.125rem auto;border-radius:3.125rem;overflow:hidden;}
+
+#curtain{width:100%; height: 100%; position: absolute; top:0; left: 0; z-index: 50; background-color:#000; opacity:0.5;}
 #curtain.fade-enter-active, #curtain.fade-leave-active{transition: opacity .5s;}
 #curtain.fade-enter, #curtain.fade-leave-active{opacity: 0;}
-
-#cover{width:100%; height: 100%; position: absolute; top:0px; left: 0px; z-index: 5;}
 </style>
