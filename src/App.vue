@@ -2,7 +2,7 @@
 <div>
     <div id="container" @click="settingsPageStyleLeft='-80%';isCurtainShow=false">
       <div id="map-box"></div>
-      <div id="main-box" v-bind:style="{backgroundColor:mainButtonBgColor, color:mainButtonTextColor}">
+      <div id="main-box" v-bind:style="{backgroundColor:mainButtonBgColor, color:mainButtonTextColor}" @click="functionTBD">
         <p>{{mainButtonText}}</p>
       </div>
       <div id="tools-box">
@@ -25,8 +25,16 @@
       <div style="width:100px;height:100px;margin:50px auto;border-radius:50px;overflow:hidden;">
         <img src="~assets/profile-photo.png" style="width:100%;height:100%;">
       </div>
-      <div class="settings-page-button">个人资料</div>
-      <div class="settings-page-button">停车记录</div>
+      <div class="settings-page-button" @click="functionTBD">
+        <img class="indicated-pic-profile" src="~assets/profile.png">
+        <div class="content-message">个人资料</div>
+        <img class="goto-pic" src="~assets/go-to-arrow.png">
+      </div>
+      <div class="settings-page-button" @click="functionTBD">
+        <img class="indicated-pic-record" src="~assets/record.png">
+        <div class="content-message">停车记录</div>
+        <img class="goto-pic" src="~assets/go-to-arrow.png">
+      </div>
     </div>
 </div>
 </template>
@@ -214,7 +222,7 @@ export default {
   methods:{
     getSettings : function(event){
       event.stopPropagation();
-      this.settingsPageStyleLeft = 0;
+      this.settingsPageStyleLeft = '-10px';
       this.isCurtainShow=true;
     },
     getCenter : function(){
@@ -308,6 +316,9 @@ export default {
       this.directionsService.setPolicy(qq.maps.DrivingPolicy[policy]);
       this.directionsService.search(new qq.maps.LatLng(start_lat, start_lng),
           new qq.maps.LatLng(stop_lat, stop_lng));
+    },
+    functionTBD: function(){
+      alert("该功能正在开发过程中，尽情期待！")
     }
   }
 }
@@ -318,15 +329,22 @@ export default {
 body{width:100%; height:100%;}
 /*#container{width:100vw; height: 100vh;}*/
 #map-box{width:100vw; height: 100vh; z-index: 1;}
+#centerMarker{position: absolute; z-index: 10;}
+#routes{font-size: 6px;}
+
 #main-box{width: 150px;height: 35px; line-height:35px; position: absolute; z-index: 10; bottom:28px; left: 50%; margin-left: -75px; font-size: 15px;text-align: center; border: 2px solid limegreen;border-radius: 20px}
 #tools-box{position: absolute; z-index: 10; bottom:23px;right: 15px; font-size: 17px;}
 #tools-box img{width: 45px; height: 45px;}
+
 #settings-box{position: absolute; z-index: 10; bottom:23px;left: 15px; font-size: 17px;}
 #settings-box img{width: 40px; height: 39px;}
-#settings-page{width:80%; height: 100%; position: absolute; z-index: 100; top:0px; font-size: 17px;background-color: #efefef; transition: left .2s linear; border-radius: 10px}
-#centerMarker{position: absolute; z-index: 10;}
-#routes{font-size: 6px;}
-.settings-page-button{width:90%;height:50px;border-top:1px solid limegreen;border-bottom:1px solid limegreen;margin:20px auto;text-align:center;line-height:50px;}
+
+#settings-page{width:80%; height: 100%; padding-left: 10px; position: absolute; z-index: 100; top:0px; font-size: 17px;background-color: #efefef; transition: left .2s linear; border-radius: 10px}
+.settings-page-button{width:90%;height:50px;border-top:1px solid limegreen;border-bottom:1px solid limegreen;margin:20px auto;line-height: 50px; display: flex; align-items: center;}
+.settings-page-button img:first-child{padding: 0 10px; width: 25px; height: 25px;}
+.settings-page-button .content-message{width:80%;}
+.settings-page-button .goto-pic{width: 8px; height: 14px; float: right;padding: 0 10px;}
+
 #curtain{width:100%; height: 100%; position: absolute; top:0px; left: 0px; z-index: 50; background-color:#000; opacity:0.5;}
 #curtain.fade-enter-active, #curtain.fade-leave-active{transition: opacity .5s;}
 #curtain.fade-enter, #curtain.fade-leave-active{opacity: 0;}
