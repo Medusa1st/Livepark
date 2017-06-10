@@ -39,7 +39,6 @@
 </template>
 
 <script>
-let map, directions_routes, directions_placemarks=[], route_lines=[];
 const pinGreenSolid = require('./assets/pin-green-solid.png');
 const pinBlueSolid = require('./assets/pin-blue-solid.png');
 const pinRed = require('./assets/pin-red.png');
@@ -49,11 +48,11 @@ const profilePhoto = require('./assets/profile-photo.png');
 const profile = require('./assets/profile.png');
 const record = require('./assets/record.png');
 const goToArrow = require('./assets/go-to-arrow.png');
-
 export default {
   name: 'app',
   data(){
     return {
+      map: null,
       aimCenterPic: aimCenter,
       settingsBoxPic: settingsBox,
       profilePhotoPic: profilePhoto,
@@ -73,6 +72,7 @@ export default {
       isCenterMarkerShow: false, 
       settingsPageStyleLeft: '-83%',
       isCurtainShow: false,
+      route_lines: [],
       //window onload map center
       onLoadCenter: {lat: '31.305468476254635', lng: '121.50784492492676'},
       //navigator start position
@@ -98,46 +98,48 @@ export default {
     }
   },
   mounted: function(){
-    // console.log(this);
+    console.log('Vue mounted!');
+    let _this = this;
+
     this.calcTop = this.$el.clientHeight/2 - this.centerMarkerHeight;
     this.calcLeft= this.$el.clientWidth/2 - this.centerMarkerWidth/2;
-
     this.navStartPos = this.onLoadCenter;
+
     //经度 Longitude
     //纬度 Latitude
-    map = new AMap.Map('map-box',{
+    this.map = new AMap.Map('map-box',{
       resizeEnable: true,
       zoom: 15,
       center: [this.onLoadCenter.lng, this.onLoadCenter.lat]
     });
-
-    AMap.service('AMap.Driving',function(){});
-    this.driving= new AMap.Driving({map: map});
-
+   
+    AMap.service('AMap.Driving',function(){
+      _this.driving = new AMap.Driving({map: _this.map});
+    });
+  
     this.addUserGPSMarker(this.onLoadCenter.lat, this.onLoadCenter.lng);
     this.addUserSelectMarker(this.navStartPos.lat, this.navStartPos.lng);
     for (let i = 0; i < this.parkGPSList.length; i++) {
       this.addTargetMarker(this.parkGPSList[i].lat, this.parkGPSList[i].lng);
     };
 
-    let _this = this;
-    map.on('dragstart', function() {
-        if(route_lines.length === 0){
+    this.map.on('dragstart', function() {
+        if(_this.route_lines.length === 0){
           _this.isCenterMarkerShow = true;
           _this.userSelectMarker.hide();
         }
     });
-    map.on('dragend', function() {
-        if(route_lines.length === 0){
-          _this.userSelectMarker.setPosition(map.getCenter());
+    this.map.on('dragend', function() {
+        if(_this.route_lines.length === 0){
+          _this.userSelectMarker.setPosition(_this.map.getCenter());
           setTimeout(function () {
             _this.isCenterMarkerShow = false;   
             _this.userSelectMarker.show();
           }, 0);
         }
     });
-    map.on('click', function(event) {
-        route_lines = [];
+    this.map.on('click', function(event) {
+        _this.route_lines = [];
         _this.driving.clear();
         _this.mainButtonBgColor = '#fff';
         _this.mainButtonTextColor = '#000';
@@ -153,13 +155,13 @@ export default {
       this.isCurtainShow=true;
     },
     getCenter : function(){
-      route_lines = [];
+      this.route_lines = [];
       this.driving.clear();
       this.mainButtonBgColor = '#fff';
       this.mainButtonTextColor = '#000';
       this.mainButtonText = '选择地点';
       let center = new AMap.LngLat(this.onLoadCenter.lng, this.onLoadCenter.lat);
-      map.setCenter(center);
+      this.map.setCenter(center);
       this.isCenterMarkerShow = false;
       this.userSelectMarker.setPosition(center);
       this.userSelectMarker.show();
@@ -169,7 +171,7 @@ export default {
     addUserGPSMarker : function(lat,lng){
         let location = new AMap.LngLat(lng, lat);
         let marker = new AMap.Marker({
-          map: map,
+          map: this.map,
           position: location,
           icon: new AMap.Icon({            
             size: new AMap.Size(24, 33),
@@ -186,7 +188,7 @@ export default {
     addUserSelectMarker : function(lat,lng){
         let location = new AMap.LngLat(lng, lat);
         this.userSelectMarker = new AMap.Marker({
-          map: map,
+          map: this.map,
           position: location,
           icon: new AMap.Icon({            
             size: new AMap.Size(48, 48),
@@ -200,7 +202,7 @@ export default {
     addTargetMarker : function(lat,lng) {
       let location = new AMap.LngLat(lng, lat);
       let marker = new AMap.Marker({
-        map: map,
+        map: this.map,
         position: location,
         icon: new AMap.Icon({            
           size: new AMap.Size(24, 33),
@@ -231,6 +233,7 @@ export default {
       let stop_lat  = lat;
       let stop_lng  = lng;
    
+      let _this = this;
       //AMap.DrivingPolicy.LEAST_TIME 最快捷模式
       //AMap.DrivingPolicy.LEAST_FEE  最经济模式
       //AMap.DrivingPolicy.LEAST_DISTANCE 最短距离模式
@@ -238,7 +241,7 @@ export default {
       this.driving.setPolicy(AMap.DrivingPolicy.LEAST_TIME);
       this.driving.search(new AMap.LngLat(start_lng, start_lat), new AMap.LngLat(stop_lng, stop_lat),function(status,result){
         if(status == 'complete'){
-          route_lines = result.routes;
+          _this.route_lines = result.routes;
         }else if(status == 'error'){
           alert(result);
         }else if(status == 'error'){
