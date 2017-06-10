@@ -19,7 +19,6 @@
       <transition name="fade">
         <div id="curtain" v-show="isCurtainShow"></div>
       </transition>
-      <!-- <div style="width:603px;padding-top:5px;;padding-left:5px;position:absolute;z-index:10000" id="routes"></div> -->
     </div>
     <div id="settings-page" v-bind:style="{left: settingsPageStyleLeft}">
       <div class="profile-photo-box">
@@ -40,7 +39,7 @@
 </template>
 
 <script>
-let map, directions_routes, directions_placemarks=[], route_lines=[], route_steps=[];
+let map, directions_routes, directions_placemarks=[], route_lines=[];
 const pinGreenSolid = require('./assets/pin-green-solid.png');
 const pinBlueSolid = require('./assets/pin-blue-solid.png');
 const pinRed = require('./assets/pin-red.png');
@@ -65,10 +64,7 @@ export default {
       mainButtonBgColor: '#fff',
       mainButtonTextColor: '#000',
       mainButtonText: '选择地点',
-      geocoder: null, 
-      // map: null, 
       marker: null,
-      markersArray: [],
       searchAddress: null,
       centerMarkerWidth: 48,
       centerMarkerHeight: 48,
@@ -98,134 +94,51 @@ export default {
         {lat: '31.30805348309488', lng: '121.48733139038086'}
       ],
       userSelectMarker: null,
-      directionsService : new qq.maps.DrivingService({
-            complete : function(response){
-                let start = response.detail.start,
-                    end = response.detail.end;
-                //清除所有路线
-                //clearOverlay(this.route_lines);
-               directions_routes = response.detail.routes;
-               let routes_desc=[];
-               //所有可选路线方案
-               for(let i = 0;i < directions_routes.length; i++){
-                    let route = directions_routes[i],
-                        legs = route;
-                    //调整地图窗口显示所有路线
-                    map.fitBounds(response.detail.bounds);
-                    //所有路程信息
-                    //for(let j = 0 ; j < legs.length; j++){
-                        let steps = legs.steps;
-                        route_steps = steps;
-                        let polyline = new qq.maps.Polyline(
-                            {
-                                path: route.path,
-                                strokeColor: '#3893F9',
-                                strokeWeight: 6,
-                                map: map
-                            }
-                        )
-                        route_lines.push(polyline);
-                         //所有路段信息
-                        for(let k = 0; k < steps.length; k++){
-                            let step = steps[k];
-                            //路段途经地标
-                            directions_placemarks.push(step.placemarks);
-                            //转向
-                            let turning  = step.turning,
-                                img_position;;
-                            switch(turning.text){
-                                case '左转':
-                                    img_position = '0px 0px'
-                                break;
-                                case '右转':
-                                    img_position = '-19px 0px'
-                                break;
-                                case '直行':
-                                    img_position = '-38px 0px'
-                                break;
-                                case '偏左转':
-                                case '靠左':
-                                    img_position = '-57px 0px'
-                                break;
-                                case '偏右转':
-                                case '靠右':
-                                    img_position = '-76px 0px'
-                                break;
-                                case '左转调头':
-                                    img_position = '-95px 0px'
-                                break;
-                                default:
-                                    img_position = ''
-                                break;
-                            }
-                            let turning_img = '&nbsp;&nbsp;<span'+
-                                ' style="margin-bottom: -4px;'+
-                                'display:inline-block;background:'+
-                                'url(http://lbs.qq.com/javascript_v2/img/turning.png) no-repeat '+
-                                img_position+';width:19px;height:'+
-                                '19px"></span>&nbsp;' ;
-                            let p_attributes = [
-                                'onclick="renderStep('+k+')"',
-                                'onmouseover=this.style.background="#eee"',
-                                'onmouseout=this.style.background="#fff"',
-                                'style="margin:5px 0px;cursor:pointer"'
-                            ].join(' ');
-                            routes_desc.push('<p '+p_attributes+' ><b>'+(k+1)+
-                            '.</b>'+turning_img+step.instructions);
-                        }
-                    //}
-               }
-               //方案文本描述
-               // let routes=document.getElementById('routes');
-               // routes.innerHTML = routes_desc.join('<br>');
-            }
-        })
+      driving: null
     }
   },
   mounted: function(){
     // console.log(this);
     this.calcTop = this.$el.clientHeight/2 - this.centerMarkerHeight;
     this.calcLeft= this.$el.clientWidth/2 - this.centerMarkerWidth/2;
-    this.navStartPos = this.onLoadCenter;
 
-    //定义map变量 调用 qq.maps.Map() 构造函数   获取地图显示容器
-    map = new window.qq.maps.Map(document.getElementById("map-box"), {
-        // 地图的中心地理坐标。
-        center: new window.qq.maps.LatLng(this.onLoadCenter.lat, this.onLoadCenter.lng),  
-        // 地图的中心地理坐标。   
-        zoom:15,
-        mapTypeControl: false,
-        zoomControl: false
-    });
-    //地址和经纬度之间进行转换服务
+    this.navStartPos = this.onLoadCenter;
     //经度 Longitude
     //纬度 Latitude
-    this.geocoder = new qq.maps.Geocoder();
+    map = new AMap.Map('map-box',{
+      resizeEnable: true,
+      zoom: 15,
+      center: [this.onLoadCenter.lng, this.onLoadCenter.lat]
+    });
+
+    AMap.service('AMap.Driving',function(){});
+    this.driving= new AMap.Driving({map: map});
+
     this.addUserGPSMarker(this.onLoadCenter.lat, this.onLoadCenter.lng);
     this.addUserSelectMarker(this.navStartPos.lat, this.navStartPos.lng);
     for (let i = 0; i < this.parkGPSList.length; i++) {
       this.addTargetMarker(this.parkGPSList[i].lat, this.parkGPSList[i].lng);
     };
-    /*let getLocationEvent = qq.maps.event.addListener(map,'click',
-      function(event) {
-          alert('您点击的位置为:[' + '纬度' + event.latLng.getLat() + ','
-                                   + '经度' + event.latLng.getLng() + ']');
-      }
-    );*/
+
     let _this = this;
-    let dragStartEvent = qq.maps.event.addListener(map, 'dragstart', function() {
+    map.on('dragstart', function() {
         if(route_lines.length === 0){
-          _this.isCenterMarkerShow=true;
-          _this.userSelectMarker.setVisible(false);
+          _this.isCenterMarkerShow = true;
+          _this.userSelectMarker.hide();
         }
     });
-    let dragEndEvent = qq.maps.event.addListener(map, 'dragend', function() {
+    map.on('dragend', function() {
         if(route_lines.length === 0){
           _this.userSelectMarker.setPosition(map.getCenter());
+          setTimeout(function () {
+            _this.isCenterMarkerShow = false;   
+            _this.userSelectMarker.show();
+          }, 0);
         }
     });
-    let clickMapEvent = qq.maps.event.addListener(map, 'click', function(event) {
-        _this.clearOverlay(route_lines);
+    map.on('click', function(event) {
+        route_lines = [];
+        _this.driving.clear();
         _this.mainButtonBgColor = '#fff';
         _this.mainButtonTextColor = '#000';
         _this.mainButtonText = '选择地点';
@@ -240,65 +153,66 @@ export default {
       this.isCurtainShow=true;
     },
     getCenter : function(){
-      this.clearOverlay(route_lines);
+      route_lines = [];
+      this.driving.clear();
       this.mainButtonBgColor = '#fff';
       this.mainButtonTextColor = '#000';
       this.mainButtonText = '选择地点';
-      let center = new window.qq.maps.LatLng(this.onLoadCenter.lat, this.onLoadCenter.lng);
+      let center = new AMap.LngLat(this.onLoadCenter.lng, this.onLoadCenter.lat);
       map.setCenter(center);
       this.isCenterMarkerShow = false;
       this.userSelectMarker.setPosition(center);
-      this.userSelectMarker.setVisible(true);
+      this.userSelectMarker.show();
       // map.zoomTo(15);
     },
     //添加标记
     addUserGPSMarker : function(lat,lng){
-        let size = new qq.maps.Size(24, 33),
-            target_icon = new qq.maps.MarkerImage(
-              pinGreenSolid,
-              size,
-              new qq.maps.Point(0, 0),
-              );
-        let location = new qq.maps.LatLng(lat, lng);
-        let marker = new qq.maps.Marker({
-            icon: target_icon,
-            position: location,
-            map: map,
-            animation: qq.maps.MarkerAnimation.BOUNCE
+        let location = new AMap.LngLat(lng, lat);
+        let marker = new AMap.Marker({
+          map: map,
+          position: location,
+          icon: new AMap.Icon({            
+            size: new AMap.Size(24, 33),
+            image: pinGreenSolid,
+            imageOffset: new AMap.Pixel(0, 0),
+            imageSize: new AMap.Size(23, 33)
+          }),
+          offset: new AMap.Pixel(-12, -33),
+          zIndex: 90
         });
+        // marker.setAnimation('AMAP_ANIMATION_BOUNCE');
+
     },
     addUserSelectMarker : function(lat,lng){
-        let size = new qq.maps.Size(48, 48),
-            target_icon = new qq.maps.MarkerImage(
-              pinRed,
-              size,
-              new qq.maps.Point(0, 0),
-              );
-        let location = new qq.maps.LatLng(lat, lng);
-        this.userSelectMarker = new qq.maps.Marker({
-            icon: target_icon,
-            position: location,
-            map: map
+        let location = new AMap.LngLat(lng, lat);
+        this.userSelectMarker = new AMap.Marker({
+          map: map,
+          position: location,
+          icon: new AMap.Icon({            
+            size: new AMap.Size(48, 48),
+            image: pinRed,
+            imageOffset: new AMap.Pixel(0, 0),
+            imageSize: new AMap.Size(48, 48)
+          }),
+          offset: new AMap.Pixel(-24, -48)
         });
     },
     addTargetMarker : function(lat,lng) {
-      let size = new qq.maps.Size(24, 33),
-          target_icon = new qq.maps.MarkerImage(
-            pinBlueSolid,
-            size,
-            new qq.maps.Point(0, 0),
-            );
-      let location = new qq.maps.LatLng(lat, lng);
-      let marker = new qq.maps.Marker({
-          icon: target_icon,
-          position: location,
-          map: map
+      let location = new AMap.LngLat(lng, lat);
+      let marker = new AMap.Marker({
+        map: map,
+        position: location,
+        icon: new AMap.Icon({            
+          size: new AMap.Size(24, 33),
+          image: pinBlueSolid,
+          imageOffset: new AMap.Pixel(0, 0),
+          imageSize: new AMap.Size(23, 33)
+        }),
+        offset: new AMap.Pixel(-12, -33)
       });
-      this.markersArray.push(marker);
-      let markerIndex = this.markersArray.length;
       let _this = this;
-      qq.maps.event.addListener(marker, 'click', function() {
-          _this.userSelectMarker.setVisible(true);
+      marker.on('click',function() {
+          _this.userSelectMarker.show();
           _this.isCenterMarkerShow = false;
           _this.calcRoute(lat,lng);
           _this.mainButtonBgColor = 'limegreen';
@@ -306,33 +220,34 @@ export default {
           _this.mainButtonText = '前往停车';
       });
     },
-    //清除地图上的marker
-    clearOverlay : function(overlays){
-      let overlay;
-      while(overlay = overlays.pop()){
-          overlay.setMap(null);
-      }
-    },
     calcRoute : function(lat,lng){
 
       //清除所有路线
-      this.clearOverlay(route_lines);
+      // this.clearOverlay(route_lines);
+      this.driving.clear();
 
       let start_lat = this.userSelectMarker.getPosition().lat;
       let start_lng = this.userSelectMarker.getPosition().lng;
       let stop_lat  = lat;
       let stop_lng  = lng;
-
-      let policy = 'LEAST_TIME'; //LEAST_DISTANCE,AVOID_HIGHWAYS,REAL_TRAFFIC,PREDICT_TRAFFIC
-      route_steps = [];
-
-      this.directionsService.setLocation("上海");
-      this.directionsService.setPolicy(qq.maps.DrivingPolicy[policy]);
-      this.directionsService.search(new qq.maps.LatLng(start_lat, start_lng),
-          new qq.maps.LatLng(stop_lat, stop_lng));
+   
+      //AMap.DrivingPolicy.LEAST_TIME 最快捷模式
+      //AMap.DrivingPolicy.LEAST_FEE  最经济模式
+      //AMap.DrivingPolicy.LEAST_DISTANCE 最短距离模式
+      //AMap.DrivingPolicy.REAL_TRAFFIC 考虑实时路况
+      this.driving.setPolicy(AMap.DrivingPolicy.LEAST_TIME);
+      this.driving.search(new AMap.LngLat(start_lng, start_lat), new AMap.LngLat(stop_lng, stop_lat),function(status,result){
+        if(status == 'complete'){
+          route_lines = result.routes;
+        }else if(status == 'error'){
+          alert(result);
+        }else if(status == 'error'){
+          alert('检索无结果');
+        }
+      });
     },
     functionTBD: function(){
-      alert("该功能正在开发过程中，尽情期待！")
+      alert("该功能正在开发过程中，敬请期待！")
     }
   }
 }
@@ -343,7 +258,6 @@ export default {
 body{width:100%; height:100%;}
 #map-box{width:100vw; height: 100vh; z-index: 1;}
 .items-on-map{position: absolute; z-index: 10;}
-/*#routes{font-size: 0.375rem;}*/
 
 #main-box{width: 10rem;height: 2.1875rem; line-height: 2.1875rem; bottom: 1.75rem; left: 50%; margin-left: -5rem; font-size: 0.9375rem; text-align: center; border: 2px solid limegreen;border-radius: 1.25rem;}
 #tools-box{bottom: 1.4375rem; right: 0.9375rem;}
