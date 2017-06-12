@@ -8,6 +8,12 @@
       <div id="settings-box" class="items-on-map">
         <img v-bind:src="settingsBoxPic" @click="getSettings">
       </div>
+      <div id="geolocation-box" class="items-on-map">
+        <img v-bind:src="aimCenterPic" @click="getLocation">
+      </div>
+      <div id="locating-box" class="items-on-map" v-show="isLocating">
+        <img v-bind:class="{rotate: isLocating}" v-bind:src="locatingPic">
+      </div>
       <div id="centerMarker" class="items-on-map" v-bind:style="{top:calcTop + 'px',left:calcLeft + 'px'}">
             <img v-bind:src="centerMarkerPic"
            v-bind:style="{width:centerMarkerWidth + 'px',height:centerMarkerHeight + 'px'}"
@@ -40,7 +46,8 @@ const pinGreenSolid = require('./assets/pin-green-solid.png');
 const pinBlueSolid = require('./assets/pin-blue-solid.png');
 const pinRed = require('./assets/pin-red.png');
 const aimCenter = require('./assets/aim-center.png');
-const settingsBox = require('./assets/settings.png');
+const settings = require('./assets/settings.png');
+const locating = require('./assets/locating.png');
 const profilePhoto = require('./assets/profile-photo.png');
 const profile = require('./assets/profile.png');
 const record = require('./assets/record.png');
@@ -52,8 +59,10 @@ export default {
       map: null,
       geolocation: null,
       isGeolocationOK: false,
+      isLocating: false,
       aimCenterPic: aimCenter,
-      settingsBoxPic: settingsBox,
+      settingsBoxPic: settings,
+      locatingPic: locating,
       profilePhotoPic: profilePhoto,
       profilePic: profile,
       recordPic: record,
@@ -111,19 +120,28 @@ export default {
     this.map.plugin(['AMap.Geolocation'], () => {
         this.geolocation = new AMap.Geolocation({
             enableHighAccuracy: true,//是否使用高精度定位，默认:true
-            timeout: 10000,          //超过10秒后停止定位，默认：无穷大buttonDom
-            // buttonDom: document.getElementById('tools-box'),
-            buttonOffset: new AMap.Pixel(18, 30), //定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
+            timeout: 3000,          //超过10秒后停止定位，默认：无穷大buttonDom
+            buttonDom: document.getElementById('geolocation-box'),
+            buttonOffset: new AMap.Pixel(0, 0), //定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
             zoomToAccuracy: true, //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
             buttonPosition:'RB'
         });
         this.map.addControl(this.geolocation);
-        this.geolocation.getCurrentPosition();
+        (() => {
+          this.geolocation.getCurrentPosition();
+          this.isLocating = true;
+        })();
+        let locatingInterval = setInterval(() => {
+          this.geolocation.getCurrentPosition();
+          this.isLocating = true;
+        },5000);
+        // this.geolocation.getCurrentPosition();
+        // this.isLocating = true;
         // this.geolocation.watchPosition(); //使用浏览器定位接口监控当前位置，移动端有效
 
         AMap.event.addListener(this.geolocation, 'complete', (data) => {
           this.isGeolocationOK = true;
-
+          this.isLocating = false;
           /*var str=['定位成功'];
           str.push('经度：' + data.position.getLng());          
           str.push('纬度：' + data.position.getLat());         
@@ -152,6 +170,7 @@ export default {
         });//返回定位信息
         AMap.event.addListener(this.geolocation, 'error', (data) => {
           this.isGeolocationOK = false;
+          this.isLocating = false;
           if(this.userSelectMarker === null){
             this.addUserSelectMarker(this.map.getCenter().lat, this.map.getCenter().lng);
           };
@@ -195,15 +214,16 @@ export default {
         this.mainButtonText = '选择地点';
         // alert('您点击的位置为:[' + '纬度' + event.latLng.getLat() + ','
         //                          + '经度' + event.latLng.getLng() + ']');
-    });
-    //add border for geolocation button
-    document.getElementsByClassName('amap-geo')[0].style.border = "2px solid limegreen";
+    });  
   },
   methods:{
     getSettings : function(event){
       event.stopPropagation();
       this.settingsPageStyleLeft = '-10px';
       this.isCurtainShow=true;
+    },
+    getLocation : function(){
+      this.isLocating = true;
     },
     addUserSelectMarker : function(lat,lng){
         let location = new AMap.LngLat(lng, lat);
@@ -275,25 +295,37 @@ export default {
 </script>
 
 <style lang="scss">
+// @import 'animations/_rotate';
+
 *{margin:0; padding:0;}
 body{width:100%; height:100%;}
 #map-box{width:100vw; height: 100vh; z-index: 1;}
 .items-on-map{position: absolute; z-index: 10;}
-
 #main-box{width: 10rem;height: 2.1875rem; line-height: 2.1875rem; bottom: 1.75rem; left: 50%; margin-left: -5rem; font-size: 0.9375rem; text-align: center; border: 2px solid limegreen;border-radius: 1.25rem;}
-
-#settings-box{bottom: 1.4375rem; left: 0.9375rem;}
-#settings-box img{width: 2.4rem; height: 2.4rem;}
-
+#settings-box{bottom: 1.6rem; left: 1rem;}
+#settings-box img{width: 2rem; height: 2rem;}
+#geolocation-box{bottom: 1.7rem; right: 1rem;}
+#geolocation-box img{width: 2.2rem; height: 2.2rem;}
+#locating-box{bottom: 4.2rem; right: 1.1rem;}
+#locating-box img{width: 1.8rem; height: 1.6rem;}
 #settings-page{width:80%; height: 100%; padding-left: 0.625rem; position: absolute; z-index: 100; top:0; font-size: 1.0625rem;background-color: #efefef; transition: left .2s linear; border-radius: 0.625rem}
 .settings-page-button{width: 90%; height: 3.125rem; border-top:1px solid limegreen;border-bottom:1px solid limegreen; margin:1.25rem auto;line-height: 3.125rem; display: flex; align-items: center;}
 .settings-page-button img:first-child{padding: 0 0.625rem; width: 1.5625rem; height: 1.5625rem;}
 .settings-page-button .content-message{width:80%;}
 .settings-page-button .goto-pic{width: 0.5rem; height: 0.875rem; float: right; padding: 0 0.625rem;}
-
 .profile-photo-box{width:6.25rem;height:6.25rem;margin:3.125rem auto;border-radius:3.125rem;overflow:hidden;}
-
 #curtain{width:100%; height: 100%; position: absolute; top:0; left: 0; z-index: 50; background-color:#000; opacity:0.5;}
 #curtain.fade-enter-active, #curtain.fade-leave-active{transition: opacity .5s;}
 #curtain.fade-enter, #curtain.fade-leave-active{opacity: 0;}
+@keyframes rotate {
+    0% {
+        transform-origin: center;
+        transform: none
+    }
+    100% {
+        transform-origin: center;
+        transform: rotate(360deg)
+    }
+}
+.rotate{animation-name: rotate;animation-duration: 2s;animation-iteration-count: infinite;}
 </style>
