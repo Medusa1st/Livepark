@@ -5,9 +5,6 @@
       <div id="main-box" class="items-on-map" v-bind:style="{backgroundColor:mainButtonBgColor, color:mainButtonTextColor}" @click="functionTBD">
         <p>{{mainButtonText}}</p>
       </div>
-      <div id="tools-box" class="items-on-map">
-        <img v-bind:src="aimCenterPic" @click="getCenter">
-      </div>
       <div id="settings-box" class="items-on-map">
         <img v-bind:src="settingsBoxPic" @click="getSettings">
       </div>
@@ -53,6 +50,8 @@ export default {
   data(){
     return {
       map: null,
+      geolocation: null,
+      isGeolocationOK: false,
       aimCenterPic: aimCenter,
       settingsBoxPic: settingsBox,
       profilePhotoPic: profilePhoto,
@@ -74,7 +73,7 @@ export default {
       isCurtainShow: false,
       route_lines: [],
       //window onload map center
-      onLoadCenter: {lat: '31.305468476254635', lng: '121.50784492492676'},
+      gpsPos: {lat: '', lng: ''},
       //navigator start position
       navStartPos: null,
       //Gps List
@@ -98,92 +97,113 @@ export default {
     }
   },
   mounted: function(){
-    console.log('Vue mounted!');
-    let _this = this;
-
-    this.calcTop = this.$el.clientHeight/2 - this.centerMarkerHeight;
+    this.calcTop = this.$el.clientHeight/2 - this.centerMarkerHeight+5;
     this.calcLeft= this.$el.clientWidth/2 - this.centerMarkerWidth/2;
-    this.navStartPos = this.onLoadCenter;
 
     //经度 Longitude
     //纬度 Latitude
     this.map = new AMap.Map('map-box',{
       resizeEnable: true,
-      zoom: 15,
-      center: [this.onLoadCenter.lng, this.onLoadCenter.lat]
+      zoom: 15
     });
+
+    //******************** Start of Geolocation ***************************
+    this.map.plugin(['AMap.Geolocation'], () => {
+        this.geolocation = new AMap.Geolocation({
+            enableHighAccuracy: true,//是否使用高精度定位，默认:true
+            timeout: 10000,          //超过10秒后停止定位，默认：无穷大buttonDom
+            // buttonDom: document.getElementById('tools-box'),
+            buttonOffset: new AMap.Pixel(18, 30), //定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
+            zoomToAccuracy: true, //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
+            buttonPosition:'RB'
+        });
+        this.map.addControl(this.geolocation);
+        this.geolocation.getCurrentPosition();
+        // this.geolocation.watchPosition(); //使用浏览器定位接口监控当前位置，移动端有效
+
+        AMap.event.addListener(this.geolocation, 'complete', (data) => {
+          this.isGeolocationOK = true;
+
+          /*var str=['定位成功'];
+          str.push('经度：' + data.position.getLng());          
+          str.push('纬度：' + data.position.getLat());         
+          if(data.accuracy){
+               str.push('精度：' + data.accuracy + ' 米');
+          }//如为IP精确定位结果则没有精度信息
+          str.push('是否经过偏移：' + (data.isConverted ? '是' : '否'));
+          alert(str.join("\n"));*/
+
+          this.gpsPos.lng = data.position.getLng();
+          this.gpsPos.lat = data.position.getLat();
+          this.navStartPos = this.gpsPos;
+          if(this.userSelectMarker === null){
+            this.addUserSelectMarker(this.gpsPos.lat, this.gpsPos.lng);
+          }else{
+            this.userSelectMarker.setPosition(new AMap.LngLat(this.gpsPos.lng, this.gpsPos.lat));
+          };
+          this.route_lines = [];
+          this.driving.clear();
+          this.mainButtonBgColor = '#fff';
+          this.mainButtonTextColor = '#000';
+          this.mainButtonText = '选择地点';
+          this.isCenterMarkerShow = false;
+          this.userSelectMarker.show();
+          
+        });//返回定位信息
+        AMap.event.addListener(this.geolocation, 'error', (data) => {
+          this.isGeolocationOK = false;
+          if(this.userSelectMarker === null){
+            this.addUserSelectMarker(this.map.getCenter().lat, this.map.getCenter().lng);
+          };
+          if(data.message === 'Geolocation permission denied.'){
+            alert("请打开“定位服务”来允许“城市乐泊”确定您的位置");
+          }else{
+            alert(data.message);
+          }
+        });//返回定位出错信息
+    });
+    //********************** End of Geolocation ***************************
    
-    AMap.service('AMap.Driving',function(){
-      _this.driving = new AMap.Driving({map: _this.map});
+    AMap.service('AMap.Driving',() => {
+      this.driving = new AMap.Driving({map: this.map});
     });
   
-    this.addUserGPSMarker(this.onLoadCenter.lat, this.onLoadCenter.lng);
-    this.addUserSelectMarker(this.navStartPos.lat, this.navStartPos.lng);
     for (let i = 0; i < this.parkGPSList.length; i++) {
       this.addTargetMarker(this.parkGPSList[i].lat, this.parkGPSList[i].lng);
     };
 
-    this.map.on('dragstart', function() {
-        if(_this.route_lines.length === 0){
-          _this.isCenterMarkerShow = true;
-          _this.userSelectMarker.hide();
+    this.map.on('dragstart', () => {
+        if(this.route_lines.length === 0){
+          this.isCenterMarkerShow = true;
+          this.userSelectMarker.hide();
         }
     });
-    this.map.on('dragend', function() {
-        if(_this.route_lines.length === 0){
-          _this.userSelectMarker.setPosition(_this.map.getCenter());
-          setTimeout(function () {
-            _this.isCenterMarkerShow = false;   
-            _this.userSelectMarker.show();
+    this.map.on('dragend', () => {
+        if(this.route_lines.length === 0){
+          this.userSelectMarker.setPosition(this.map.getCenter());
+          setTimeout(() => {
+            this.isCenterMarkerShow = false;
+            this.userSelectMarker.show();
           }, 0);
         }
     });
-    this.map.on('click', function(event) {
-        _this.route_lines = [];
-        _this.driving.clear();
-        _this.mainButtonBgColor = '#fff';
-        _this.mainButtonTextColor = '#000';
-        _this.mainButtonText = '选择地点';
+    this.map.on('click', (event) => {
+        this.route_lines = [];
+        this.driving.clear();
+        this.mainButtonBgColor = '#fff';
+        this.mainButtonTextColor = '#000';
+        this.mainButtonText = '选择地点';
         // alert('您点击的位置为:[' + '纬度' + event.latLng.getLat() + ','
         //                          + '经度' + event.latLng.getLng() + ']');
     });
+    //add border for geolocation button
+    document.getElementsByClassName('amap-geo')[0].style.border = "2px solid limegreen";
   },
   methods:{
     getSettings : function(event){
       event.stopPropagation();
       this.settingsPageStyleLeft = '-10px';
       this.isCurtainShow=true;
-    },
-    getCenter : function(){
-      this.route_lines = [];
-      this.driving.clear();
-      this.mainButtonBgColor = '#fff';
-      this.mainButtonTextColor = '#000';
-      this.mainButtonText = '选择地点';
-      let center = new AMap.LngLat(this.onLoadCenter.lng, this.onLoadCenter.lat);
-      this.map.setCenter(center);
-      this.isCenterMarkerShow = false;
-      this.userSelectMarker.setPosition(center);
-      this.userSelectMarker.show();
-      // map.zoomTo(15);
-    },
-    //添加标记
-    addUserGPSMarker : function(lat,lng){
-        let location = new AMap.LngLat(lng, lat);
-        let marker = new AMap.Marker({
-          map: this.map,
-          position: location,
-          icon: new AMap.Icon({            
-            size: new AMap.Size(24, 33),
-            image: pinGreenSolid,
-            imageOffset: new AMap.Pixel(0, 0),
-            imageSize: new AMap.Size(23, 33)
-          }),
-          offset: new AMap.Pixel(-12, -33),
-          zIndex: 90
-        });
-        // marker.setAnimation('AMAP_ANIMATION_BOUNCE');
-
     },
     addUserSelectMarker : function(lat,lng){
         let location = new AMap.LngLat(lng, lat);
@@ -196,7 +216,7 @@ export default {
             imageOffset: new AMap.Pixel(0, 0),
             imageSize: new AMap.Size(48, 48)
           }),
-          offset: new AMap.Pixel(-24, -48)
+          offset: new AMap.Pixel(-24, -43)
         });
     },
     addTargetMarker : function(lat,lng) {
@@ -212,14 +232,13 @@ export default {
         }),
         offset: new AMap.Pixel(-12, -33)
       });
-      let _this = this;
-      marker.on('click',function() {
-          _this.userSelectMarker.show();
-          _this.isCenterMarkerShow = false;
-          _this.calcRoute(lat,lng);
-          _this.mainButtonBgColor = 'limegreen';
-          _this.mainButtonTextColor = '#FFF';
-          _this.mainButtonText = '前往停车';
+      marker.on('click',() => {
+          this.userSelectMarker.show();
+          this.isCenterMarkerShow = false;
+          this.calcRoute(lat,lng);
+          this.mainButtonBgColor = 'limegreen';
+          this.mainButtonTextColor = '#FFF';
+          this.mainButtonText = '前往停车';
       });
     },
     calcRoute : function(lat,lng){
@@ -233,15 +252,14 @@ export default {
       let stop_lat  = lat;
       let stop_lng  = lng;
    
-      let _this = this;
       //AMap.DrivingPolicy.LEAST_TIME 最快捷模式
       //AMap.DrivingPolicy.LEAST_FEE  最经济模式
       //AMap.DrivingPolicy.LEAST_DISTANCE 最短距离模式
       //AMap.DrivingPolicy.REAL_TRAFFIC 考虑实时路况
       this.driving.setPolicy(AMap.DrivingPolicy.LEAST_TIME);
-      this.driving.search(new AMap.LngLat(start_lng, start_lat), new AMap.LngLat(stop_lng, stop_lat),function(status,result){
+      this.driving.search(new AMap.LngLat(start_lng, start_lat), new AMap.LngLat(stop_lng, stop_lat), (status,result) => {
         if(status == 'complete'){
-          _this.route_lines = result.routes;
+          this.route_lines = result.routes;
         }else if(status == 'error'){
           alert(result);
         }else if(status == 'error'){
@@ -263,11 +281,9 @@ body{width:100%; height:100%;}
 .items-on-map{position: absolute; z-index: 10;}
 
 #main-box{width: 10rem;height: 2.1875rem; line-height: 2.1875rem; bottom: 1.75rem; left: 50%; margin-left: -5rem; font-size: 0.9375rem; text-align: center; border: 2px solid limegreen;border-radius: 1.25rem;}
-#tools-box{bottom: 1.4375rem; right: 0.9375rem;}
-#tools-box img{width: 2.8125rem; height: 2.8125rem;}
 
 #settings-box{bottom: 1.4375rem; left: 0.9375rem;}
-#settings-box img{width: 2.5rem; height: 2.5rem;}
+#settings-box img{width: 2.4rem; height: 2.4rem;}
 
 #settings-page{width:80%; height: 100%; padding-left: 0.625rem; position: absolute; z-index: 100; top:0; font-size: 1.0625rem;background-color: #efefef; transition: left .2s linear; border-radius: 0.625rem}
 .settings-page-button{width: 90%; height: 3.125rem; border-top:1px solid limegreen;border-bottom:1px solid limegreen; margin:1.25rem auto;line-height: 3.125rem; display: flex; align-items: center;}
