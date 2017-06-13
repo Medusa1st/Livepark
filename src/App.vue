@@ -60,6 +60,7 @@ export default {
       geolocation: null,
       isGeolocationOK: false,
       isLocating: false,
+      isMapAutoPan: true,
       aimCenterPic: aimCenter,
       settingsBoxPic: settings,
       locatingPic: locating,
@@ -123,8 +124,9 @@ export default {
             timeout: 3000,          //超过10秒后停止定位，默认：无穷大buttonDom
             buttonDom: document.getElementById('geolocation-box'),
             buttonOffset: new AMap.Pixel(0, 0), //定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
-            zoomToAccuracy: true, //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
-            buttonPosition:'RB'
+            zoomToAccuracy: false, //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
+            buttonPosition:'RB',
+            panToLocation: false  //定位成功后将定位到的位置作为地图中心点
         });
         this.map.addControl(this.geolocation);
         (() => {
@@ -142,6 +144,7 @@ export default {
         AMap.event.addListener(this.geolocation, 'complete', (data) => {
           this.isGeolocationOK = true;
           this.isLocating = false;
+        
           /*var str=['定位成功'];
           str.push('经度：' + data.position.getLng());          
           str.push('纬度：' + data.position.getLat());         
@@ -156,17 +159,22 @@ export default {
           this.navStartPos = this.gpsPos;
           if(this.userSelectMarker === null){
             this.addUserSelectMarker(this.gpsPos.lat, this.gpsPos.lng);
-          }else{
-            this.userSelectMarker.setPosition(new AMap.LngLat(this.gpsPos.lng, this.gpsPos.lat));
           };
-          this.route_lines = [];
-          this.driving.clear();
-          this.mainButtonBgColor = '#fff';
-          this.mainButtonTextColor = '#000';
-          this.mainButtonText = '选择地点';
-          this.isCenterMarkerShow = false;
-          this.userSelectMarker.show();
-          
+            
+          if(this.isMapAutoPan){
+            this.map.panTo(data.position);
+            this.map.setZoom(16);
+            this.userSelectMarker.setPosition(new AMap.LngLat(this.gpsPos.lng, this.gpsPos.lat));
+            this.route_lines = [];
+            this.driving.clear();
+            this.mainButtonBgColor = '#fff';
+            this.mainButtonTextColor = '#000';
+            this.mainButtonText = '选择地点';
+            this.isCenterMarkerShow = false;
+            this.userSelectMarker.show();
+            this.isMapAutoPan = false;
+          };
+        
         });//返回定位信息
         AMap.event.addListener(this.geolocation, 'error', (data) => {
           this.isGeolocationOK = false;
@@ -177,7 +185,7 @@ export default {
           if(data.message === 'Geolocation permission denied.'){
             alert("请打开“定位服务”来允许“城市乐泊”确定您的位置");
           }else{
-            alert(data.message);
+            console.log(data.message);
           }
         });//返回定位出错信息
     });
@@ -224,6 +232,7 @@ export default {
     },
     getLocation : function(){
       this.isLocating = true;
+      this.isMapAutoPan = true;
     },
     addUserSelectMarker : function(lat,lng){
         let location = new AMap.LngLat(lng, lat);
