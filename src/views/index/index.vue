@@ -1,15 +1,15 @@
 <template>
 <div>
-    <div id="container" @click="settingsPageStyleLeft='-83%';isCurtainShow=false">
+    <div id="container" @click="onClickContainer">
       <div id="map-box"></div>
-      <div id="main-box" class="items-on-map" v-bind:style="{backgroundColor:mainButtonBgColor, color:mainButtonTextColor}" @click="functionTBD">
+      <div id="main-box" class="items-on-map" v-bind:style="{backgroundColor:mainButtonBgColor, color:mainButtonTextColor, zIndex: bubbleSelectParkingZIndex}" @click.stop="toPark">
         <p>{{mainButtonText}}</p>
       </div>
       <div id="settings-box" class="items-on-map">
-        <img v-bind:src="settingsBoxPic" @click="getSettings">
+        <img v-bind:src="settingsBoxPic" @click.stop="getSettings">
       </div>
       <div id="geolocation-box" class="items-on-map">
-        <img v-bind:src="aimCenterPic" @click="getLocation">
+        <img v-bind:src="aimCenterPic" @click.stop="getLocation">
       </div>
       <div id="locating-box" class="items-on-map" v-show="isLocating">
         <img v-bind:class="{rotate: isLocating}" v-bind:src="locatingPic">
@@ -19,6 +19,7 @@
            v-bind:style="{width:centerMarkerWidth + 'px',height:centerMarkerHeight + 'px'}"
            v-show="isCenterMarkerShow"/>         
       </div>
+      
       <transition name="fade">
         <div id="curtain" v-show="isCurtainShow"></div>
       </transition>
@@ -27,17 +28,49 @@
       <div class="profile-photo-box">
         <img v-bind:src="profilePhotoPic" style="width:100%;height:100%;">
       </div>
-      <div class="settings-page-button" @click="functionTBD">
+      <div class="settings-page-button" @click.stop="linkToProfile">
         <img class="indicated-pic-profile" v-bind:src="profilePic">
-        <div class="content-message">个人资料</div>
+        <div class="content-message">个人信息</div>
         <img class="goto-pic" v-bind:src="goToArrowPic">
       </div>
-      <div class="settings-page-button" @click="functionTBD">
+      <div class="settings-page-button" @click.stop="linkToRecord">
         <img class="indicated-pic-record" v-bind:src="recordPic">
         <div class="content-message">停车记录</div>
         <img class="goto-pic" v-bind:src="goToArrowPic">
       </div>
     </div>
+    <div id="selectParking-box" class="items-on-map" v-bind:style="{zIndex: bubbleSelectParkingZIndex}" v-show="isSelectParkingShow">
+        <div id="selectParking-box-title">
+          <h2>智能停车终端信息</h2>
+        </div>
+        <div id="selectParking-box-info">
+          <hr>
+          <div class="parking-info">
+            <p>地点：</p>
+            <p>xxx路xxx号附近</p>
+          </div>
+          <div class="parking-info">
+            <p>编号：</p>
+            <p>031-101</p>
+          </div>
+          <div class="parking-info">
+            <p>当前空闲车位数：</p>
+            <p>2</p>
+          </div>
+        </div>
+        <div id="selectParking-box-select">
+          <hr>        
+          <h3>请选择一个停车位：</h3>
+          <div class="parking-info">
+            <p>车位号：<span>031-101-1</span></p>
+            <input type="radio" name="parkingSN" value="031-101-1" v-model="pickedParkingSN" @click.stop="parkingPicked"/>
+          </div>
+          <div class="parking-info">
+            <p>车位号：<span>031-101-2</span></p>
+            <input type="radio" name="parkingSN" value="031-101-2" v-model="pickedParkingSN" @click.stop="parkingPicked"/>
+          </div>
+        </div>
+      </div>
 </div>
 </template>
 
@@ -48,7 +81,8 @@ const pinRed = require('../../assets/pin-red.png');
 const aimCenter = require('../../assets/aim-center.png');
 const settings = require('../../assets/settings.png');
 const locating = require('../../assets/locating.png');
-const profilePhoto = require('../../assets/profile-photo.png');
+// const profilePhoto = require('../../assets/profile-photo.png');
+const profilePhoto = require('../../assets/test-account-photo-1.jpg');
 const profile = require('../../assets/profile.png');
 const record = require('../../assets/record.png');
 const goToArrow = require('../../assets/go-to-arrow.png');
@@ -60,6 +94,7 @@ export default {
       geolocation: null,
       isGeolocationOK: false,
       isLocating: false,
+      locatingInterval: null,
       isMapAutoPan: true,
       aimCenterPic: aimCenter,
       settingsBoxPic: settings,
@@ -79,6 +114,7 @@ export default {
       calcTop: null,
       calcLeft: null,
       isCenterMarkerShow: false, 
+      isSelectParkingShow: false,
       settingsPageStyleLeft: '-83%',
       isCurtainShow: false,
       route_lines: [],
@@ -89,15 +125,24 @@ export default {
       //Gps List
       parkGPSList: [],
       userSelectMarker: null,
-      driving: null
+      driving: null,
+      pickedParkingSN: null,
+      bubbleSelectParkingZIndex: 10
     }
   },
   mounted: function() {
+    console.log('Vue of index mounted!');
+
     // promise es6
-    axios.get('/static/position.json').then(({ data }) => {
+    axios.get('/static/position.json').then(({ data }) => {  
       this.parkGPSList = data;
-      // this.init()
+      console.log(this.parkGPSList);
+      for (let i = 0; i < this.parkGPSList.length; i++) {
+        this.addTargetMarker(this.parkGPSList[i].lat, this.parkGPSList[i].lng);
+      };
     });
+
+    // this.init()
 
     this.calcTop = this.$el.clientHeight/2 - this.centerMarkerHeight+5;
     this.calcLeft= this.$el.clientWidth/2 - this.centerMarkerWidth/2;
@@ -125,7 +170,7 @@ export default {
           this.geolocation.getCurrentPosition();
           this.isLocating = true;
         })();
-        let locatingInterval = setInterval(() => {
+        this.locatingInterval = setInterval(() => {
           this.geolocation.getCurrentPosition();
           this.isLocating = true;
         },5000);
@@ -186,11 +231,7 @@ export default {
     AMap.service('AMap.Driving',() => {
       this.driving = new AMap.Driving({map: this.map});
     });
-  
-    for (let i = 0; i < this.parkGPSList.length; i++) {
-      this.addTargetMarker(this.parkGPSList[i].lat, this.parkGPSList[i].lng);
-    };
-
+    
     this.map.on('dragstart', () => {
         if(this.route_lines.length === 0){
           this.isCenterMarkerShow = true;
@@ -217,8 +258,24 @@ export default {
     });  
   },
   methods:{
+    onClickContainer: function(){
+      this.settingsPageStyleLeft='-83%';
+      this.bubbleSelectParkingZIndex = 10;
+      this.isCurtainShow=false;
+      this.isSelectParkingShow=false;
+      this.pickedParkingSN = null;
+      if(this.route_lines.length){
+        this.mainButtonBgColor = 'limegreen';
+        this.mainButtonTextColor = '#FFF';
+        this.mainButtonText = '选择车位';
+      }else{
+        this.mainButtonBgColor = '#fff';
+        this.mainButtonTextColor = '#000';
+        this.mainButtonText = '选择地点';        
+      }
+    },
     getSettings : function(event){
-      event.stopPropagation();
+      // event.stopPropagation();
       this.settingsPageStyleLeft = '-10px';
       this.isCurtainShow=true;
     },
@@ -259,7 +316,7 @@ export default {
           this.calcRoute(lat,lng);
           this.mainButtonBgColor = 'limegreen';
           this.mainButtonTextColor = '#FFF';
-          this.mainButtonText = '前往停车';
+          this.mainButtonText = '选择车位';
       });
     },
     calcRoute : function(lat,lng){
@@ -288,8 +345,34 @@ export default {
         }
       });
     },
-    functionTBD: function(){
-      alert("该功能正在开发过程中，敬请期待！")
+    linkToProfile: function(){
+      if(this.locatingInterval){clearInterval(this.locatingInterval);};
+      this.$router.push({
+        path: '/profile'
+      })
+    },
+    linkToRecord: function(){
+      if(this.locatingInterval){clearInterval(this.locatingInterval);};
+      this.$router.push({
+        path: '/record'
+      })
+    },
+    parkingPicked: function(){
+      console.log(22);
+      this.mainButtonBgColor = 'limegreen';
+      this.mainButtonTextColor = '#FFF';
+      this.mainButtonText = '前往停车';
+    },
+    toPark: function(){
+      if(this.route_lines.length){
+        if(this.pickedParkingSN){
+          alert("前往停车");
+        }else{
+          this.bubbleSelectParkingZIndex = 51;
+          this.isSelectParkingShow = true;
+          this.isCurtainShow = true;
+        }
+      }
     }
   }
 }
@@ -302,19 +385,29 @@ export default {
 body{width:100%; height:100%;}
 #map-box{width:100vw; height: 100vh; z-index: 1;}
 .items-on-map{position: absolute; z-index: 10;}
-#main-box{width: 10rem;height: 2.1875rem; line-height: 2.1875rem; bottom: 1.75rem; left: 50%; margin-left: -5rem; font-size: 0.9375rem; text-align: center; border: 2px solid limegreen;border-radius: 1.25rem;}
+#main-box{width: 10rem;height: 2.1875rem; line-height: 2rem; bottom: 1.75rem; left: 50%; margin-left: -5rem; font-size: 0.9375rem; text-align: center; border: 2px solid limegreen;border-radius: 1.25rem;}
 #settings-box{bottom: 1.6rem; left: 1rem;}
 #settings-box img{width: 2rem; height: 2rem;}
 #geolocation-box{bottom: 1.7rem; right: 1rem;}
 #geolocation-box img{width: 2.2rem; height: 2.2rem;}
 #locating-box{bottom: 4.2rem; right: 1.1rem;}
 #locating-box img{width: 1.8rem; height: 1.6rem;}
-#settings-page{width:80%; height: 100%; padding-left: 0.625rem; position: absolute; z-index: 100; top:0; font-size: 1.0625rem;background-color: #efefef; transition: left .2s linear; border-radius: 0.625rem}
+#settings-page{width:80%; height: 100%; padding-left: 0.625rem; position: absolute; z-index: 100; top:0; font-size: 1.0625rem;background-color: #f2f2f2; transition: left .2s linear; border-radius: 0.625rem}
 .settings-page-button{width: 90%; height: 3.125rem; border-top:1px solid limegreen;border-bottom:1px solid limegreen; margin:1.25rem auto;line-height: 3.125rem; display: flex; align-items: center;}
-.settings-page-button img:first-child{margin: 0 0.625rem; width: 1.5625rem; height: 1.5625rem;}
+.settings-page-button img:first-child{margin: 0 0.5rem; width: 1.5625rem; height: 1.5625rem;}
 .settings-page-button .content-message{width:80%;}
-.settings-page-button .goto-pic{width: 0.5rem; height: 0.875rem; float: right; padding: 0 0.625rem;}
+.settings-page-button .goto-pic{width: 0.5rem; height: 0.875rem; float: right; margin: 0 0.5rem;}
 .profile-photo-box{width:6.25rem;height:6.25rem;margin:3.125rem auto;border-radius:3.125rem;overflow:hidden;}
+
+#selectParking-box{width:18rem; height:20rem;border: 1px solid; border-radius: 1rem; top: 50%;left: 50%;margin-left: -9rem;margin-top: -10rem;background-color: #f2f2f2;text-align: center;}
+#selectParking-box .parking-info{display: flex; justify-content: space-between; margin: 10px 20px;}
+#selectParking-box p{font-size: 1rem}
+#selectParking-box-title{height: 2rem; line-height: 2rem;}
+#selectParking-box-title h2{ margin: 0 auto;}
+#selectParking-box-info{height: 40%; margin: 0 10px;}
+#selectParking-box-select{height: 50%; margin: 0 10px;}
+#selectParking-box-select h3{margin: 10px;}
+
 #curtain{width:100%; height: 100%; position: absolute; top:0; left: 0; z-index: 50; background-color:#000; opacity:0.5;}
 #curtain.fade-enter-active, #curtain.fade-leave-active{transition: opacity .5s;}
 #curtain.fade-enter, #curtain.fade-leave-active{opacity: 0;}
