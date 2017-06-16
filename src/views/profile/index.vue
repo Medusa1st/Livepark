@@ -27,7 +27,7 @@
       <hr>
       <div id="profile-info-carnumber">
         <p>车牌号</p>
-        <p>沪NB8888</p>
+        <p>沪AB1234</p>
       </div>
       <hr>
     </div>

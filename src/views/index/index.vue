@@ -2,7 +2,7 @@
 <div>
     <div id="container" @click="onClickContainer">
       <div id="map-box"></div>
-      <div id="main-box" class="items-on-map" v-bind:style="{backgroundColor:mainButtonBgColor, color:mainButtonTextColor, zIndex: bubbleSelectParkingZIndex}" @click.stop="toPark">
+      <div id="main-box" class="items-on-map" v-bind:style="{backgroundColor:mainButtonBgColor, color:mainButtonTextColor, borderColor: mainButtonBorderColor , zIndex: bubbleSelectParkingZIndex}" @click.stop="toPark">
         <p>{{mainButtonText}}</p>
       </div>
       <div id="settings-box" class="items-on-map">
@@ -45,15 +45,15 @@
         </div>
         <div id="selectParking-box-info">
           <hr>
-          <div class="parking-info">
+          <div class="selected-parking-info">
             <p>地点：</p>
             <p>xxx路xxx号附近</p>
           </div>
-          <div class="parking-info">
+          <div class="selected-parking-info">
             <p>编号：</p>
             <p>031-101</p>
           </div>
-          <div class="parking-info">
+          <div class="selected-parking-info">
             <p>当前空闲车位数：</p>
             <p>2</p>
           </div>
@@ -61,16 +61,16 @@
         <div id="selectParking-box-select">
           <hr>        
           <h3>请选择一个停车位：</h3>
-          <div class="parking-info">
+          <div class="selected-parking-info">
             <p>车位号：<span>031-101-1</span></p>
             <input type="radio" name="parkingSN" value="031-101-1" v-model="pickedParkingSN" @click.stop="parkingPicked"/>
           </div>
-          <div class="parking-info">
+          <div class="selected-parking-info">
             <p>车位号：<span>031-101-2</span></p>
             <input type="radio" name="parkingSN" value="031-101-2" v-model="pickedParkingSN" @click.stop="parkingPicked"/>
           </div>
         </div>
-      </div>
+    </div>
 </div>
 </template>
 
@@ -107,6 +107,7 @@ export default {
       mainButtonBgColor: '#fff',
       mainButtonTextColor: '#000',
       mainButtonText: '选择地点',
+      mainButtonBorderColor: 'limegreen',
       marker: null,
       searchAddress: null,
       centerMarkerWidth: 48,
@@ -127,7 +128,9 @@ export default {
       userSelectMarker: null,
       driving: null,
       pickedParkingSN: null,
-      bubbleSelectParkingZIndex: 10
+      bubbleSelectParkingZIndex: 10,
+      isBookingStatus: false,
+      bookingTimeout: null
     }
   },
   mounted: function() {
@@ -136,7 +139,6 @@ export default {
     // promise es6
     axios.get('/static/position.json').then(({ data }) => {  
       this.parkGPSList = data;
-      console.log(this.parkGPSList);
       for (let i = 0; i < this.parkGPSList.length; i++) {
         this.addTargetMarker(this.parkGPSList[i].lat, this.parkGPSList[i].lng);
       };
@@ -173,7 +175,7 @@ export default {
         this.locatingInterval = setInterval(() => {
           this.geolocation.getCurrentPosition();
           this.isLocating = true;
-        },5000);
+        },10000);
         // this.geolocation.getCurrentPosition();
         // this.isLocating = true;
         // this.geolocation.watchPosition(); //使用浏览器定位接口监控当前位置，移动端有效
@@ -204,6 +206,7 @@ export default {
             this.userSelectMarker.setPosition(new AMap.LngLat(this.gpsPos.lng, this.gpsPos.lat));
             this.route_lines = [];
             this.driving.clear();
+            this.mainButtonBorderColor = 'limegreen';
             this.mainButtonBgColor = '#fff';
             this.mainButtonTextColor = '#000';
             this.mainButtonText = '选择地点';
@@ -250,11 +253,12 @@ export default {
     this.map.on('click', (event) => {
         this.route_lines = [];
         this.driving.clear();
+        this.mainButtonBorderColor = 'limegreen';
         this.mainButtonBgColor = '#fff';
         this.mainButtonTextColor = '#000';
         this.mainButtonText = '选择地点';
-        // alert('您点击的位置为:[' + '纬度' + event.latLng.getLat() + ','
-        //                          + '经度' + event.latLng.getLng() + ']');
+        // alert('您点击的位置为:[' + '纬度' + event.lnglat.lat + ','
+        //                          + '经度' + event.lnglat.lng + ']');
     });  
   },
   methods:{
@@ -265,10 +269,12 @@ export default {
       this.isSelectParkingShow=false;
       this.pickedParkingSN = null;
       if(this.route_lines.length){
+        this.mainButtonBorderColor = 'limegreen';
         this.mainButtonBgColor = 'limegreen';
         this.mainButtonTextColor = '#FFF';
         this.mainButtonText = '选择车位';
       }else{
+        this.mainButtonBorderColor = 'limegreen';
         this.mainButtonBgColor = '#fff';
         this.mainButtonTextColor = '#000';
         this.mainButtonText = '选择地点';        
@@ -314,6 +320,7 @@ export default {
           this.userSelectMarker.show();
           this.isCenterMarkerShow = false;
           this.calcRoute(lat,lng);
+          this.mainButtonBorderColor = 'limegreen';
           this.mainButtonBgColor = 'limegreen';
           this.mainButtonTextColor = '#FFF';
           this.mainButtonText = '选择车位';
@@ -358,15 +365,40 @@ export default {
       })
     },
     parkingPicked: function(){
-      console.log(22);
+      this.mainButtonBorderColor = 'limegreen';
       this.mainButtonBgColor = 'limegreen';
       this.mainButtonTextColor = '#FFF';
       this.mainButtonText = '前往停车';
     },
     toPark: function(){
-      if(this.route_lines.length){
+      if(this.isBookingStatus){
+        let isCancelBooking = confirm('是否取消预约？');
+        if(isCancelBooking){
+        this.isBookingStatus = false;
+        this.pickedParkingSN = null;
+        this.mainButtonBorderColor = 'limegreen';
+        this.mainButtonBgColor = 'limegreen';
+        this.mainButtonTextColor = '#FFF';
+        this.mainButtonText = '选择车位';
+          clearTimeout(this.bookingTimeout);
+        }
+      }else if(this.route_lines.length){
         if(this.pickedParkingSN){
-          alert("前往停车");
+          this.isSelectParkingShow = false;
+          this.isCurtainShow = false;
+          this.mainButtonBorderColor = 'Orange';
+          this.mainButtonBgColor = 'Orange';
+          this.mainButtonTextColor = '#FFF';
+          this.mainButtonText = '已预约车位';
+          this.isBookingStatus = true;
+          this.bookingTimeout = setTimeout(() => {
+            this.isBookingStatus = false;
+            if(this.locatingInterval){clearInterval(this.locatingInterval);};
+            this.$router.push({
+              path: '/ready-to-park'
+            });
+          },10000)
+
         }else{
           this.bubbleSelectParkingZIndex = 51;
           this.isSelectParkingShow = true;
@@ -385,7 +417,7 @@ export default {
 body{width:100%; height:100%;}
 #map-box{width:100vw; height: 100vh; z-index: 1;}
 .items-on-map{position: absolute; z-index: 10;}
-#main-box{width: 10rem;height: 2.1875rem; line-height: 2rem; bottom: 1.75rem; left: 50%; margin-left: -5rem; font-size: 0.9375rem; text-align: center; border: 2px solid limegreen;border-radius: 1.25rem;}
+#main-box{width: 10rem;height: 2.1875rem; line-height: 2rem; bottom: 1.75rem; left: 50%; margin-left: -5rem; font-size: 0.9375rem; text-align: center; border: 2px solid;border-radius: 1.25rem;}
 #settings-box{bottom: 1.6rem; left: 1rem;}
 #settings-box img{width: 2rem; height: 2rem;}
 #geolocation-box{bottom: 1.7rem; right: 1rem;}
@@ -399,13 +431,13 @@ body{width:100%; height:100%;}
 .settings-page-button .goto-pic{width: 0.5rem; height: 0.875rem; float: right; margin: 0 0.5rem;}
 .profile-photo-box{width:6.25rem;height:6.25rem;margin:3.125rem auto;border-radius:3.125rem;overflow:hidden;}
 
-#selectParking-box{width:18rem; height:20rem;border: 1px solid; border-radius: 1rem; top: 50%;left: 50%;margin-left: -9rem;margin-top: -10rem;background-color: #f2f2f2;text-align: center;}
-#selectParking-box .parking-info{display: flex; justify-content: space-between; margin: 10px 20px;}
+#selectParking-box{width:18rem; height:20rem;border: 1px solid limegreen; border-radius: 1rem; top: 50%;left: 50%;margin-left: -9rem;margin-top: -10rem;background-color: #f2f2f2;text-align: center;}
+#selectParking-box .selected-parking-info{display: flex; justify-content: space-between; margin: 0.8rem 1rem;}
 #selectParking-box p{font-size: 1rem}
-#selectParking-box-title{height: 2rem; line-height: 2rem;}
+#selectParking-box-title{height: 3rem; line-height: 3rem;}
 #selectParking-box-title h2{ margin: 0 auto;}
-#selectParking-box-info{height: 40%; margin: 0 10px;}
-#selectParking-box-select{height: 50%; margin: 0 10px;}
+#selectParking-box-info{height: 8rem; margin: 0 0.6rem;}
+#selectParking-box-select{height: 9rem; margin: 0 0.6rem;}
 #selectParking-box-select h3{margin: 10px;}
 
 #curtain{width:100%; height: 100%; position: absolute; top:0; left: 0; z-index: 50; background-color:#000; opacity:0.5;}
