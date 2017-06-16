@@ -137,7 +137,7 @@ export default {
     console.log('Vue of index mounted!');
 
     // promise es6
-    axios.get('/static/position.json').then(({ data }) => {  
+    axios.get('static/position.json').then(({ data }) => {  
       this.parkGPSList = data;
       for (let i = 0; i < this.parkGPSList.length; i++) {
         this.addTargetMarker(this.parkGPSList[i].lat, this.parkGPSList[i].lng);
@@ -165,7 +165,8 @@ export default {
             buttonOffset: new AMap.Pixel(0, 0), //定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
             zoomToAccuracy: false, //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
             buttonPosition:'RB',
-            panToLocation: false  //定位成功后将定位到的位置作为地图中心点
+            panToLocation: false,  //定位成功后将定位到的位置作为地图中心点
+            showCircle: false
         });
         this.map.addControl(this.geolocation);
         (() => {
