@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app1">
     <transition name="fade" mode="out-in">
       <router-view></router-view>
     </transition>
@@ -8,7 +8,7 @@
 
 <script>
 export default {
-  name: 'app'
+  name: 'app1'
 }
 </script>
 

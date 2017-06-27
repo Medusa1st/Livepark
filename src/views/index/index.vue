@@ -416,6 +416,7 @@ export default {
 
 *{margin:0; padding:0;}
 body{width:100%; height:100%;}
+#container{position: relative;}
 #map-box{width:100vw; height: 100vh; z-index: 1;}
 .items-on-map{position: absolute; z-index: 10;}
 #main-box{width: 10rem;height: 2.1875rem; line-height: 2rem; bottom: 1.75rem; left: 50%; margin-left: -5rem; font-size: 0.9375rem; text-align: center; border: 2px solid;border-radius: 1.25rem;}
@@ -423,7 +424,7 @@ body{width:100%; height:100%;}
 #settings-box img{width: 2rem; height: 2rem;}
 #geolocation-box{bottom: 1.7rem; right: 1rem;}
 #geolocation-box img{width: 2.2rem; height: 2.2rem;}
-#locating-box{bottom: 4.2rem; right: 1.1rem;}
+#locating-box{bottom: 4.2rem; right: 1.2rem;}
 #locating-box img{width: 1.8rem; height: 1.6rem;}
 #settings-page{width:80%; height: 100%; padding-left: 0.625rem; position: absolute; z-index: 100; top:0; font-size: 1.0625rem;background-color: #f2f2f2; transition: left .2s linear; border-radius: 0.625rem}
 .settings-page-button{width: 90%; height: 3.125rem; border-top:1px solid limegreen;border-bottom:1px solid limegreen; margin:1.25rem auto;line-height: 3.125rem; display: flex; align-items: center;}
