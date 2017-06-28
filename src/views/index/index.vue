@@ -30,44 +30,56 @@
       </div>
       <div class="settings-page-button" @click.stop="linkToProfile">
         <img class="indicated-pic-profile" v-bind:src="profilePic">
-        <div class="content-message">个人信息</div>
+        <div class="button-title">个人信息</div>
         <img class="goto-pic" v-bind:src="goToArrowPic">
       </div>
       <div class="settings-page-button" @click.stop="linkToRecord">
         <img class="indicated-pic-record" v-bind:src="recordPic">
-        <div class="content-message">停车记录</div>
+        <div class="button-title">停车记录</div>
         <img class="goto-pic" v-bind:src="goToArrowPic">
       </div>
     </div>
     <div id="selectParking-box" class="items-on-map" v-bind:style="{zIndex: bubbleSelectParkingZIndex}" v-show="isSelectParkingShow">
         <div id="selectParking-box-title">
-          <h2>智能停车终端信息</h2>
+          <h3>目的地信息</h3>
         </div>
         <div id="selectParking-box-info">
           <hr>
-          <div class="selected-parking-info">
+          <div class="content">
             <p>地点：</p>
-            <p>xxx路xxx号附近</p>
+            <span>xxx路xxx号附近</span>
           </div>
-          <div class="selected-parking-info">
-            <p>编号：</p>
-            <p>031-101</p>
+          <div class="content">
+            <p>终端编号：</p>
+            <span>031-101</span>
           </div>
-          <div class="selected-parking-info">
+          <div class="content">
             <p>当前空闲车位数：</p>
-            <p>2</p>
+            <span>2</span>
           </div>
         </div>
         <div id="selectParking-box-select">
           <hr>        
-          <h3>请选择一个停车位：</h3>
-          <div class="selected-parking-info">
+          <h4>请选择一个停车位</h4>
+          <div class="content">
             <p>车位号：<span>031-101-1</span></p>
             <input type="radio" name="parkingSN" value="031-101-1" v-model="pickedParkingSN" @click.stop="parkingPicked"/>
           </div>
-          <div class="selected-parking-info">
+          <div class="content">
             <p>车位号：<span>031-101-2</span></p>
             <input type="radio" name="parkingSN" value="031-101-2" v-model="pickedParkingSN" @click.stop="parkingPicked"/>
+          </div>
+        </div>
+        <div id="selectParking-box-price">
+          <hr>
+          <h4>目的地停车价格</h4>
+          <div class="content">        
+            <p>6:00 — 18:00</p>
+            <span>免费2小时<br>超过10元/小时</span>
+          </div>
+          <div class="content">
+            <p>18:00 — 次日6:00</p>
+            <span>5元/小时</span>    
           </div>
         </div>
     </div>
@@ -369,7 +381,7 @@ export default {
       this.mainButtonBorderColor = 'limegreen';
       this.mainButtonBgColor = 'limegreen';
       this.mainButtonTextColor = '#FFF';
-      this.mainButtonText = '前往停车';
+      this.mainButtonText = '选择车牌';
     },
     toPark: function(){
       if(this.isBookingStatus){
@@ -411,7 +423,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 // @import 'animations/_rotate';
 
 *{margin:0; padding:0;}
@@ -429,18 +441,18 @@ body{width:100%; height:100%;}
 #settings-page{width:80%; height: 100%; padding-left: 0.625rem; position: absolute; z-index: 100; top:0; font-size: 1.0625rem;background-color: #f2f2f2; transition: left .2s linear; border-radius: 0.625rem}
 .settings-page-button{width: 90%; height: 3.125rem; border-top:1px solid limegreen;border-bottom:1px solid limegreen; margin:1.25rem auto;line-height: 3.125rem; display: flex; align-items: center;}
 .settings-page-button img:first-child{margin: 0 0.5rem; width: 1.5625rem; height: 1.5625rem;}
-.settings-page-button .content-message{width:80%;}
+.settings-page-button .button-title{width:80%;}
 .settings-page-button .goto-pic{width: 0.5rem; height: 0.875rem; float: right; margin: 0 0.5rem;}
 .profile-photo-box{width:6.25rem;height:6.25rem;margin:3.125rem auto;border-radius:3.125rem;overflow:hidden;}
 
-#selectParking-box{width:18rem; height:20rem;border: 1px solid limegreen; border-radius: 1rem; top: 50%;left: 50%;margin-left: -9rem;margin-top: -10rem;background-color: #f2f2f2;text-align: center;}
-#selectParking-box .selected-parking-info{display: flex; justify-content: space-between; margin: 0.8rem 1rem;}
-#selectParking-box p{font-size: 1rem}
-#selectParking-box-title{height: 3rem; line-height: 3rem;}
-#selectParking-box-title h2{ margin: 0 auto;}
-#selectParking-box-info{height: 8rem; margin: 0 0.6rem;}
-#selectParking-box-select{height: 9rem; margin: 0 0.6rem;}
-#selectParking-box-select h3{margin: 10px;}
+#selectParking-box{width:18rem; border-radius: 0.5rem; top: 50%;left: 50%;margin-left: -9rem;margin-top: -14rem;background-color: #f2f2f2;text-align: center;}
+#selectParking-box .content{display: flex; justify-content: space-between; margin: 0.8rem 1rem;}
+#selectParking-box .content p{font-size: 1rem;}
+#selectParking-box .content span{font-size: 0.8rem; color: blue}
+#selectParking-box-title h3{ margin: 3px auto;}
+#selectParking-box-info{margin: 0 0.6rem;}
+#selectParking-box-select,#selectParking-box-price{margin: 0 0.6rem;}
+#selectParking-box-select h4,#selectParking-box-price h4{margin: 4px;}
 
 #curtain{width:100%; height: 100%; position: absolute; top:0; left: 0; z-index: 50; background-color:#000; opacity:0.5;}
 #curtain.fade-enter-active, #curtain.fade-leave-active{transition: opacity .5s;}
