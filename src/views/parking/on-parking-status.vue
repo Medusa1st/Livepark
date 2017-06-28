@@ -7,11 +7,10 @@
         <p>停车时长</p>
         <p>{{indicatedTime}}</p>
         <p>当前费用：<span>0.0</span>元</p>
-        <p>您停车的地点位于：<span>xxx路xxx号</span>附近</p>
+        <!-- <p>您停车的地点位于：<span>xxx路xxx号</span>附近</p> -->
         <p>车位号：<span>031-101-1</span></p>
       </div>  
       <div class="on-parking-status-button" @click="stopParking">结束停车</div>
-
     </div>
 </template>
 
