@@ -24,7 +24,8 @@ import Pay from '../pay/pay.vue'
                 title: '停车信息',
                 startTime: 0,
                 indicatedTime: '',
-                countInterval: null
+                countInterval: null,
+                cost: '0.00'
             }
         },
         components: {

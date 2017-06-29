@@ -10,7 +10,7 @@
           <hr>
           <p>您还可以：</p>
           <div class="user-content" v-show="isNewPlateNumberShow">
-          <select name="province" id="province" v-model="inputProvince">
+          <select name="province" id="province" v-model="$parent.inputProvince">
             <option value="沪">沪</option>
             <option value="苏">苏</option>
             <option value="粤">粤</option>
@@ -42,9 +42,9 @@
           <button class="add-plate-number-button" @click="addNewPlateNumber">新增车牌</button>
           <hr>
         <p>当前使用车牌：</p>
-        <div class="option-content" v-for="(item,index) of userPlateNumberList">
+        <div class="option-content" v-for="(item,index) of $parent.userPlateNumberList">
           <span>{{item.plateNumber}}</span>
-          <input v-model="userSelectIndex" type="radio" name="user-select" :value="index" :checked="item.isDefault">
+          <input v-model="$parent.currentSelectedPlateIndex" type="radio" name="user-select" :value="index" :checked="item.isDefault">
         </div>        
       </div>
   </div>
@@ -55,13 +55,8 @@
     name: 'select-plate-number',
     data(){
       return {
-        userSelectIndex: 0,
         isNewPlateNumberShow: false,
         inputUserPlateNumber: '',
-        inputProvince: '沪',
-        userPlateNumberList: [
-          {plateNumber: '沪AB1234', isDefault: true}
-        ],
         isErrorInfoShow: false
       }
     },
@@ -81,7 +76,7 @@
         if(letterNum >= 1 && letterNum <= 3 && isFisrtLetter){
           this.isNewPlateNumberShow = false;
           this.isErrorInfoShow = false;
-          this.userPlateNumberList.push({plateNumber: this.inputProvince + this.inputUserPlateNumber, isDefault: false});
+          this.$parent.userPlateNumberList.push({plateNumber: this.$parent.inputProvince + this.inputUserPlateNumber, isDefault: false});
         }else{
           this.isErrorInfoShow = true;
         }

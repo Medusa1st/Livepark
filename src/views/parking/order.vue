@@ -10,11 +10,11 @@
         <p class="info-title">您的预约信息</p> 
         <div>
           <p class="info-name">车位号</p>
-          <span class="serial-number">031-101-1</span>
+          <span class="serial-number">{{$route.params.sn}}</span>
         </div>
         <div>
           <p class="info-name">车牌号</p>
-          <span class="serial-number">沪AB1234</span>
+          <span class="serial-number">{{$route.params.pn}}</span>
         </div>
         <p class="price-info">预付款费用：<span>10元</span></p>
         <hr>
@@ -41,7 +41,8 @@ import Pay from '../pay/pay.vue'
                 startTime: null,
                 actualWaitTime: 600000,
                 indicatedTime: '',
-                countDownInterval: null
+                countDownInterval: null,
+                cost: '10.00'
             }
         },
         components: {

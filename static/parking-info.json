@@ -1,0 +1,374 @@
+[
+{
+  "position": {"lat": "31.308071816223425","lng": "121.5029525756836"},
+  "sn": "001",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.308035149962773","lng": "121.51102066040039"},
+  "sn": "002",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.3022783700433","lng": "121.50629997253418"},
+  "sn": "003",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.304368451830978","lng": "121.51320934295654"},
+  "sn": "004",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.293844235737975","lng": "121.50381088256836"},
+  "sn": "005",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.31512980559464","lng": "121.51196479797363"},
+  "sn": "006",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.309758448785676","lng": "121.52020454406738"},
+  "sn": "007",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.31555143497141","lng": "121.49660110473633"},
+  "sn": "008",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.282291914094","lng": "121.51651382446289"},
+  "sn": "009",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.373718178573974","lng": "121.44235610961914"},
+  "sn": "010",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.258229203122266","lng": "121.57153129577637"},
+  "sn": "011",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.16566270170272","lng": "121.33901596069336"},
+  "sn": "012",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.30805348309488","lng": "121.48733139038086"},
+  "sn": "013",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "30.968453","lng": "121.804723"},
+  "sn": "014",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.008481","lng": "121.833562"},
+  "sn": "015",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "30.874204","lng": "121.858281"},
+  "sn": "016",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.003773","lng": "121.34879"},
+  "sn": "017",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.159022","lng": "121.720266"},
+  "sn": "018",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.252989","lng": "121.412648"},
+  "sn": "019",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.254163","lng": "121.670827"},
+  "sn": "020",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.003773","lng": "121.525258"},
+  "sn": "021",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.34569","lng": "121.440114"},
+  "sn": "022",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.285856","lng": "121.626882"},
+  "sn": "023",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "30.927155","lng": "121.625251"},
+  "sn": "024",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "30.822252","lng": "121.393165"},
+  "sn": "025",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "30.963667","lng": "121.43299"},
+  "sn": "026",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.061357","lng": "121.389045"},
+  "sn": "027",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.169523","lng": "121.518134"},
+  "sn": "028",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.238825","lng": "121.515388"},
+  "sn": "029",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.223559","lng": "121.481055"},
+  "sn": "030",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.155421","lng": "121.409644"},
+  "sn": "031",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.301036","lng": "121.442603"},
+  "sn": "032",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.167173","lng": "121.496162"},
+  "sn": "033",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.202418","lng": "121.442603"},
+  "sn": "034",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.231779","lng": "121.446723"},
+  "sn": "035",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.255262","lng": "121.511268"},
+  "sn": "036",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.265827","lng": "121.45359"},
+  "sn": "037",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.218862","lng": "121.454963"},
+  "sn": "038",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.214164","lng": "121.494788"},
+  "sn": "039",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.350306","lng": "121.471442"},
+  "sn": "040",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.021352","lng": "121.409644"},
+  "sn": "041",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.420647","lng": "121.643104"},
+  "sn": "042",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.547714","lng": "121.752967"},
+  "sn": "043",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.664673","lng": "121.470412"},
+  "sn": "044",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.025471","lng": "121.743697"},
+  "sn": "045",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.100758","lng": "121.592635"},
+  "sn": "046",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.239265","lng": "121.468524"},
+  "sn": "047",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.259224","lng": "121.474704"},
+  "sn": "048",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.202271","lng": "121.466464"},
+  "sn": "049",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.199335","lng": "121.486377"},
+  "sn": "050",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.285634","lng": "121.470584"},
+  "sn": "051",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.10943","lng": "121.526889"},
+  "sn": "052",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.189937","lng": "121.612033"},
+  "sn": "053",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.125301","lng": "121.676578"},
+  "sn": "054",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.107666","lng": "121.441745"},
+  "sn": "055",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "31.229284","lng": "121.463718"},
+  "sn": "056",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "30.88841","lng": "121.907269"},
+  "sn": "057",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "30.870141","lng": "121.917912"},
+  "sn": "058",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "30.917279","lng": "121.917225"},
+  "sn": "059",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "30.971459","lng": "121.896282"},
+  "sn": "060",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "30.929355","lng": "121.863323"},
+  "sn": "061",
+  "totalNum": 3,
+  "remainNum": 2
+}, 
+{
+  "position": {"lat": "30.883327","lng": "121.681877"},
+  "sn": "062",
+  "totalNum": 3,
+  "remainNum": 2
+}
+]

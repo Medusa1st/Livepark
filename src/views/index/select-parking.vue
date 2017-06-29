@@ -11,24 +11,24 @@
         </div>-->
         <div class="select-content">
           <p>终端编号：</p>
-          <span>031-101</span>
+          <span>{{$parent.currentSelectedSN}}</span>
         </div>
         <div class="select-content">
           <p>当前空闲车位数：</p>
-          <span>2</span>
+          <span>{{$parent.currentRemainNum}}</span>
         </div>
       </div>
       <div id="selectParking-box-select">
         <hr>        
         <h4>请选择一个停车位</h4>
-        <div class="select-content">
-          <p>车位号：<span>031-101-1</span></p>
-          <input type="radio" name="031-101-1" value="031-101-1" v-model="$parent.pickedParkingSN" @click.stop="$parent.parkingPicked"/>
+        <div class="select-content" v-for="n of $parent.currentRemainNum">
+          <p>车位号：<span>{{$parent.currentSelectedSN}}-{{n}}</span></p>
+          <input type="radio" :name="$parent.currentSelectedSN + '-' + n" :value="$parent.currentSelectedSN + '-' + n" v-model="$parent.pickedParkingSN" @click.stop="$parent.parkingPicked"/>
         </div>
-        <div class="select-content">
-          <p>车位号：<span>031-101-2</span></p>
+        <!-- <div class="select-content">
+          <p>车位号：<span>{{$parent.currentSelectedSN}}-2</span></p>
           <input type="radio" name="031-101-2" value="031-101-2" v-model="$parent.pickedParkingSN" @click.stop="$parent.parkingPicked"/>
-        </div>
+        </div> -->
       </div>
       <div id="selectParking-box-price">
         <hr>

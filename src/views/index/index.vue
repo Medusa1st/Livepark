@@ -87,13 +87,21 @@ export default {
       //navigator start position
       navStartPos: null,
       //Gps List
-      parkGPSList: [],
+      parkingInfoList: [],
       userSelectMarker: null,
       driving: null,
       pickedParkingSN: null,
       bubbleSelectParkingZIndex: 10,
       isBookingStatus: false,
-      bookingTimeout: null
+      bookingTimeout: null,
+      inputProvince: '沪',
+      userPlateNumberList: [
+        {plateNumber: '沪AB1234', isDefault: true}
+      ],
+      currentSelectedPlateIndex: 0,
+      currentSelectedPlateNum: 0,
+      currentSelectedSN: '',
+      currentRemainNum: ''
     }
   },
   components:{
@@ -105,10 +113,10 @@ export default {
     console.log('Vue of index mounted!');
 
     // promise es6
-    axios.get('static/position.json').then(({ data }) => {  
-      this.parkGPSList = data;
-      for (let i = 0; i < this.parkGPSList.length; i++) {
-        this.addTargetMarker(this.parkGPSList[i].lat, this.parkGPSList[i].lng);
+    axios.get('static/parking-info.json').then(({ data }) => {
+      this.parkingInfoList = data;
+      for (let i = 0; i < this.parkingInfoList.length; i++) {
+        this.addTargetMarker(this.parkingInfoList[i].position.lat, this.parkingInfoList[i].position.lng,this.parkingInfoList[i].sn,this.parkingInfoList[i].remainNum);
       };
     });
 
@@ -275,7 +283,7 @@ export default {
           offset: new AMap.Pixel(-24, -43)
         });
     },
-    addTargetMarker : function(lat,lng) {
+    addTargetMarker : function(lat,lng,index,remainNum) {
       let location = new AMap.LngLat(lng, lat);
       let marker = new AMap.Marker({
         map: this.map,
@@ -289,6 +297,8 @@ export default {
         offset: new AMap.Pixel(-12, -33)
       });
       marker.on('click',() => {
+          this.currentSelectedSN = index;
+          this.currentRemainNum = remainNum;
           this.userSelectMarker.show();
           this.isCenterMarkerShow = false;
           this.calcRoute(lat,lng);
@@ -337,7 +347,6 @@ export default {
       })
     },
     parkingPicked: function(){
-      console.log(document.querySelector('.content>input'));
       this.mainButtonBorderColor = 'limegreen';
       this.mainButtonBgColor = 'limegreen';
       this.mainButtonTextColor = '#FFF';
@@ -374,8 +383,10 @@ export default {
               this.mainButtonText = '选择车位';
               clearTimeout(this.bookingTimeout);
             },600000)*/
+            this.currentSelectedPlateNum =  this.userPlateNumberList[this.currentSelectedPlateIndex].plateNumber;
+
             this.$router.push({
-              path: '/order'
+              path: '/order/' + this.pickedParkingSN +'/'+ this.currentSelectedPlateNum
             });
 
           }else{

@@ -4,7 +4,7 @@
         <p class="pay-title">支付</p>
         <hr>
         <p class="pay-to">乐派停车</p>
-        <p class="pay-number">¥10.00</p>
+        <p class="pay-number">¥{{$parent.cost}}</p>
         <hr>
         <div class="pay-mode">
           <img src="../../assets/pay-logo.png" alt="">

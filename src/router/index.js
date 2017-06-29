@@ -17,6 +17,6 @@ export default new Router({
     { path: '/record', name: 'Record', component: Record },
     { path: '/ready-to-park', name: 'readyToPark', component: readyToPark },
     { path: '/on-parking-status', name: 'onParkingStatus', component: onParkingStatus },
-    { path: '/order', name: 'Order', component: Order },
+    { path: '/order/:sn/:pn', name: 'Order', component: Order },
   ]
 })
