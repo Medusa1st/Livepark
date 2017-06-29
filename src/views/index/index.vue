@@ -8,7 +8,7 @@
       <div id="settings-box" class="items-on-map">
         <img v-bind:src="settingsBoxPic" @click.stop="getSettings">
       </div>
-      <div id="geolocation-box" class="items-on-map">
+      <div id="geolocation-box" class="items-on-map" v-show="isBookingStatus==false">
         <img v-bind:src="aimCenterPic" @click.stop="getLocation">
       </div>
       <div id="locating-box" class="items-on-map" v-show="isLocating">
@@ -19,7 +19,9 @@
            v-bind:style="{width:centerMarkerWidth + 'px',height:centerMarkerHeight + 'px'}"
            v-show="isCenterMarkerShow"/>         
       </div>
-      
+      <!-- <div class="items-on-map" style="top: 0rem; right: 0rem;">
+        <button style="width: 6rem;height:2rem;" @click="trigParkIn">Trigger</button>
+      </div> -->
       <transition name="fade">
         <div id="curtain" v-show="isCurtainShow"></div>
       </transition>
@@ -91,11 +93,7 @@ export default {
       pickedParkingSN: null,
       bubbleSelectParkingZIndex: 10,
       isBookingStatus: false,
-      bookingTimeout: null,
-      userPlateNumberOption: '',
-      userPlateNumber: '',
-      isTipInfoShow: false,
-      isErrorInfoShow: false
+      bookingTimeout: null
     }
   },
   components:{
@@ -241,9 +239,7 @@ export default {
       this.bubbleSelectParkingZIndex = 10;
       this.isSelectParkingShow = false;
       this.isSelectPlateNumberShow = false;
-      this.isErrorInfoShow =false;
       this.pickedParkingSN = null;
-      this.userPlateNumberOption = '';
       if(this.route_lines.length){
         this.mainButtonBorderColor = 'limegreen';
         this.mainButtonBgColor = 'limegreen';
@@ -353,21 +349,16 @@ export default {
         if(isCancelBooking){
         this.isBookingStatus = false;
         this.pickedParkingSN = null;
-        this.userPlateNumberOption = null;
-        this.userPlateNumber = null;
         this.mainButtonBorderColor = 'limegreen';
         this.mainButtonBgColor = 'limegreen';
         this.mainButtonTextColor = '#FFF';
         this.mainButtonText = '选择车位';
-          clearTimeout(this.bookingTimeout);
+        clearTimeout(this.bookingTimeout);
         }
       }else if(this.route_lines.length){
         if(this.pickedParkingSN){
-          this.isSelectParkingShow = false;
-          this.isSelectPlateNumberShow =true;
-          if(this.userPlateNumberOption == 'default-number' || this.userPlateNumber.length == 6){
-            this.isSelectPlateNumberShow =false;
-            this.isErrorInfoShow = false;
+          if(this.isSelectPlateNumberShow == true){
+            /*this.isSelectPlateNumberShow =false;
             this.isCurtainShow = false;
             this.mainButtonBorderColor = 'Orange';
             this.mainButtonBgColor = 'Orange';
@@ -376,16 +367,20 @@ export default {
             this.isBookingStatus = true;
             this.bookingTimeout = setTimeout(() => {
               this.isBookingStatus = false;
-              if(this.locatingInterval){clearInterval(this.locatingInterval);};
-              this.$router.push({
-                path: '/ready-to-park'
-              });
-            },10000)
-          }
-          if(this.userPlateNumberOption == 'user-select' && this.userPlateNumber.length != 6){
-            this.isErrorInfoShow = true;
-          }else if(this.userPlateNumber == null){
-            this.isErrorInfoShow = true;
+              this.pickedParkingSN = null;
+              this.mainButtonBorderColor = 'limegreen';
+              this.mainButtonBgColor = 'limegreen';
+              this.mainButtonTextColor = '#FFF';
+              this.mainButtonText = '选择车位';
+              clearTimeout(this.bookingTimeout);
+            },600000)*/
+            this.$router.push({
+              path: '/order'
+            });
+
+          }else{
+            this.isSelectParkingShow = false;
+            this.isSelectPlateNumberShow =true;
           }
         }else{
           this.bubbleSelectParkingZIndex = 51;
@@ -393,6 +388,12 @@ export default {
           this.isCurtainShow = true;
         }
       }
+    },
+    trigParkIn(){
+      this.isBookingStatus = false;
+      this.$router.push({
+        path: '/ready-to-park'
+      });
     }
   }
 }

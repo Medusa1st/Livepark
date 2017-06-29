@@ -52,8 +52,8 @@
 </script>
 
 <style scoped>
-#selectParking-box{width:18rem; border-radius: 0.5rem; top: 50%;left: 50%;margin-left: -9rem;margin-top: -14rem;background-color: #f2f2f2;text-align: center;}
-#selectParking-box .select-content{display: flex; justify-content: space-between; margin: 0.8rem 1rem;}
+#selectParking-box{width:18rem; border-radius: 0.5rem; top: 50%;left: 50%;margin-left: -9rem;margin-top: -50%;background-color: #f2f2f2;text-align: center;}
+#selectParking-box .select-content{display: flex; justify-content: space-between; margin: 0.5rem 1rem;}
 #selectParking-box .select-content p{font-size: 1rem;}
 #selectParking-box .select-content span{font-size: 0.8rem; color: blue}
 #selectParking-box-title h3{ margin: 3px auto;}

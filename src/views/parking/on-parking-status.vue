@@ -1,5 +1,6 @@
 <template>
     <div id="cp-on-parking-status">
+      <pay></pay>
       <div class="page-title">
         <p>{{ title }}</p>   
       </div>
@@ -15,6 +16,7 @@
 </template>
 
 <script>
+import Pay from '../pay/pay.vue'
     export default{
         name: 'on-parking-status',
         data: function(){
@@ -24,6 +26,9 @@
                 indicatedTime: '',
                 countInterval: null
             }
+        },
+        components: {
+          Pay
         },
         mounted: function(){
             this.startTime = new Date().getTime();
@@ -50,11 +55,9 @@
         },
         methods: {
           stopParking: function(){
-            if(confirm('是否要结束停车？')){
-              clearInterval(this.countInterval);
-              alert('停车时长：'+ this.indicatedTime + "\n" + "请支付0元");
-              this.$router.push('/');
-            }
+            this.$children[0].isPaymentShow = true;
+            this.$children[0].onPrePayStatus = false;
+            this.$children[0].onEndPayStatus = true;           
           }
         }
     }
