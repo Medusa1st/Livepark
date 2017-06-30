@@ -9,7 +9,8 @@
         <p>{{indicatedTime}}</p>
         <p>当前费用：<span>0.0</span>元</p>
         <!-- <p>您停车的地点位于：<span>xxx路xxx号</span>附近</p> -->
-        <p>车位号：<span>031-101-1</span></p>
+        <p>车位号：<span>{{$route.params.sn}}</span></p>
+        <p>车牌号：<span>{{$route.params.pn}}</span></p>
       </div>  
       <div class="on-parking-status-button" @click="stopParking">结束停车</div>
     </div>
@@ -70,9 +71,11 @@ import Pay from '../pay/pay.vue'
   .page-title img{width: 0.5rem; height: 0.875rem; position: absolute; margin: 0 1rem; }
   .page-title p{font-size: 1rem; text-align: center; } 
 
-  .on-parking-status-timer{width: 21rem; height: 12rem;text-align: center;margin: 2rem auto;background-color: #fff;border-radius: 0.5rem;}
+  .on-parking-status-timer{width: 21rem; text-align: center;margin: 2rem auto;background-color: #fff;border-radius: 0.5rem;padding: 1rem 0;}
   .on-parking-status-timer p:nth-child(1){font-size: 1.3rem; line-height: 3rem;}
   .on-parking-status-timer p:nth-child(2){font-size: 3.5rem; line-height: 3.5rem;}
   .on-parking-status-timer p:nth-child(3){font-size: 1rem; line-height: 3rem;}
+  .on-parking-status-timer p:nth-child(4) span{color: blue;}
+  .on-parking-status-timer p:nth-child(5) span{color: blue;}
   .on-parking-status-button{width: 21rem; height: 3rem;text-align: center;line-height:3rem;font-size: 1rem;background-color: #FF3030;color: #fff;margin: 2rem auto;border-radius: 0.5rem;}
 </style>   

@@ -34,7 +34,7 @@
         if(this.onPrePayStatus){   
           clearInterval(this.countDownInterval);
           this.$router.push({
-            path: '/on-parking-status'
+            path: '/on-parking-status/' + this.$route.params.sn +'/'+ this.$route.params.pn
           })
         }else if(this.onEndPayStatus){
           this.$router.push('/');

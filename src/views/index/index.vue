@@ -2,6 +2,7 @@
 <div>
     <div id="container" @click="onClickContainer">
       <div id="map-box"></div>
+      <div id="search-box" class="items-on-map"><input id="keyword" placeholder="输入关键词查询地点" /></div>
       <div id="main-box" class="items-on-map" v-bind:style="{backgroundColor:mainButtonBgColor, color:mainButtonTextColor, borderColor: mainButtonBorderColor , zIndex: bubbleSelectParkingZIndex}" @click.stop="toPark">
         <p>{{mainButtonText}}</p>
       </div>
@@ -15,7 +16,7 @@
         <img v-bind:class="{rotate: isLocating}" v-bind:src="locatingPic">
       </div>
       <div id="centerMarker" class="items-on-map" v-bind:style="{top:calcTop + 'px',left:calcLeft + 'px'}">
-            <img v-bind:src="centerMarkerPic"
+        <img v-bind:src="centerMarkerPic"
            v-bind:style="{width:centerMarkerWidth + 'px',height:centerMarkerHeight + 'px'}"
            v-show="isCenterMarkerShow"/>         
       </div>
@@ -130,6 +131,22 @@ export default {
     this.map = new AMap.Map('map-box',{
       resizeEnable: true,
       zoom: 15
+    });
+
+    AMap.plugin(['AMap.Autocomplete','AMap.PlaceSearch'],() => {
+      var autoOptions = {
+        city: "上海", //城市，默认全国
+        input: "keyword"//使用联想输入的input的id
+      };
+      let autocomplete = new AMap.Autocomplete(autoOptions);
+      var placeSearch = new AMap.PlaceSearch({
+            city:'上海',
+            map: this.map
+      })
+      AMap.event.addListener(autocomplete, "select", function(e){
+         //TODO 针对选中的poi实现自己的功能
+         placeSearch.search(e.poi.name)
+      });
     });
 
     //******************** Start of Geolocation ***************************
@@ -419,6 +436,8 @@ body{width:100%; height:100%;}
 #map-box{width:100vw; height: 100vh; z-index: 1;}
 .items-on-map{position: absolute; z-index: 10;}
 #main-box{width: 10rem;height: 2.1875rem; line-height: 2rem; bottom: 1.75rem; left: 50%; margin-left: -5rem; font-size: 0.9375rem; text-align: center; border: 2px solid;border-radius: 1.25rem;}
+#search-box{top: 1rem; left: 50%; width: 20rem; margin-left: -10rem;}
+#search-box #keyword{width: 100%; height: 2rem; font-size: 1rem;}
 #settings-box{bottom: 1.6rem; left: 1rem;}
 #settings-box img{width: 2rem; height: 2rem;}
 #geolocation-box{bottom: 1.7rem; right: 1rem;}
