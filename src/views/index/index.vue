@@ -2,7 +2,10 @@
 <div>
     <div id="container" @click="onClickContainer">
       <div id="map-box"></div>
-      <div id="search-box" class="items-on-map"><input id="keyword" placeholder="输入关键词查询地点" /></div>
+      <div id="search-box" class="items-on-map">
+        <input id="keyword" placeholder="输入关键字查询地点" v-model="keyword" />
+        <button @click="searchPlace">搜索</button>
+      </div>
       <div id="main-box" class="items-on-map" v-bind:style="{backgroundColor:mainButtonBgColor, color:mainButtonTextColor, borderColor: mainButtonBorderColor , zIndex: bubbleSelectParkingZIndex}" @click.stop="toPark">
         <p>{{mainButtonText}}</p>
       </div>
@@ -28,8 +31,8 @@
       </transition>
     </div>
     <settings-page></settings-page>
-    <select-parking></select-parking>
-    <select-plate-number></select-plate-number>
+    <select-parking  v-if="isSelectParkingShow"></select-parking>
+    <select-plate-number v-if="isSelectPlateNumberShow"></select-plate-number>
 </div>
 </template>
 
@@ -54,6 +57,8 @@ export default {
   data(){
     return {
       map: null,
+      placeSearch: null,
+      keyword: null,
       geolocation: null,
       isGeolocationOK: false,
       isLocating: false,
@@ -69,7 +74,7 @@ export default {
       centerMarkerPic: pinRed,
       mainButtonBgColor: '#fff',
       mainButtonTextColor: '#000',
-      mainButtonText: '选择地点',
+      mainButtonText: '选择车位',
       mainButtonBorderColor: 'limegreen',
       marker: null,
       searchAddress: null,
@@ -134,18 +139,19 @@ export default {
     });
 
     AMap.plugin(['AMap.Autocomplete','AMap.PlaceSearch'],() => {
-      var autoOptions = {
+      let autoOptions = {
         city: "上海", //城市，默认全国
         input: "keyword"//使用联想输入的input的id
       };
       let autocomplete = new AMap.Autocomplete(autoOptions);
-      var placeSearch = new AMap.PlaceSearch({
+      this.placeSearch = new AMap.PlaceSearch({
             city:'上海',
             map: this.map
       })
-      AMap.event.addListener(autocomplete, "select", function(e){
+      AMap.event.addListener(autocomplete, "select", (e) => {
          //TODO 针对选中的poi实现自己的功能
-         placeSearch.search(e.poi.name)
+         this.keyword = e.poi.name;
+         this.placeSearch.search(e.poi.name);
       });
     });
 
@@ -167,6 +173,7 @@ export default {
           this.isLocating = true;
         })();
         this.locatingInterval = setInterval(() => {
+          console.log('Start locating……');
           this.geolocation.getCurrentPosition();
           this.isLocating = true;
         },10000);
@@ -200,10 +207,7 @@ export default {
             this.userSelectMarker.setPosition(new AMap.LngLat(this.gpsPos.lng, this.gpsPos.lat));
             this.route_lines = [];
             this.driving.clear();
-            this.mainButtonBorderColor = 'limegreen';
-            this.mainButtonBgColor = '#fff';
-            this.mainButtonTextColor = '#000';
-            this.mainButtonText = '选择地点';
+            this.changeMainButtonToSelect();
             this.isCenterMarkerShow = false;
             this.userSelectMarker.show();
             this.isMapAutoPan = false;
@@ -235,7 +239,7 @@ export default {
           this.userSelectMarker.hide();
         }
     });
-    this.map.on('dragend', () => {
+    this.map.on('dragging', () => {
         if(this.route_lines.length === 0){
           this.userSelectMarker.setPosition(this.map.getCenter());
           setTimeout(() => {
@@ -248,10 +252,8 @@ export default {
         if(!this.isBookingStatus){
           this.route_lines = [];
           this.driving.clear();
-          this.mainButtonBorderColor = 'limegreen';
-          this.mainButtonBgColor = '#fff';
-          this.mainButtonTextColor = '#000';
-          this.mainButtonText = '选择地点';
+          this.placeSearch.clear();
+          this.changeMainButtonToSelect();
           // alert('您点击的位置为:[' + '纬度' + event.lnglat.lat + ','
           //                          + '经度' + event.lnglat.lng + ']');
         }
@@ -266,15 +268,9 @@ export default {
       this.isSelectPlateNumberShow = false;
       this.pickedParkingSN = null;
       if(this.route_lines.length){
-        this.mainButtonBorderColor = 'limegreen';
-        this.mainButtonBgColor = 'limegreen';
-        this.mainButtonTextColor = '#FFF';
-        this.mainButtonText = '选择车位';
+        this.changeMainButtonToConfirm();
       }else{
-        this.mainButtonBorderColor = 'limegreen';
-        this.mainButtonBgColor = '#fff';
-        this.mainButtonTextColor = '#000';
-        this.mainButtonText = '选择地点';        
+        this.changeMainButtonToSelect();
       }
     },
     getSettings : function(event){
@@ -319,11 +315,8 @@ export default {
           this.userSelectMarker.show();
           this.isCenterMarkerShow = false;
           this.calcRoute(lat,lng);
-          this.mainButtonBorderColor = 'limegreen';
-          this.mainButtonBgColor = 'limegreen';
-          this.mainButtonTextColor = '#FFF';
-          this.mainButtonText = '选择车位';
-      });
+          this.changeMainButtonToConfirm();
+       });
     },
     calcRoute : function(lat,lng){
 
@@ -364,10 +357,7 @@ export default {
       })
     },
     parkingPicked: function(){
-      this.mainButtonBorderColor = 'limegreen';
-      this.mainButtonBgColor = 'limegreen';
-      this.mainButtonTextColor = '#FFF';
-      this.mainButtonText = '选择车牌';
+      this.changeMainButtonToConfirm();
     },
     toPark: function(){
       if(this.isBookingStatus){
@@ -375,10 +365,7 @@ export default {
         if(isCancelBooking){
         this.isBookingStatus = false;
         this.pickedParkingSN = null;
-        this.mainButtonBorderColor = 'limegreen';
-        this.mainButtonBgColor = 'limegreen';
-        this.mainButtonTextColor = '#FFF';
-        this.mainButtonText = '选择车位';
+        this.changeMainButtonToConfirm();
         clearTimeout(this.bookingTimeout);
         }
       }else if(this.route_lines.length){
@@ -422,6 +409,23 @@ export default {
       this.$router.push({
         path: '/ready-to-park'
       });
+    },
+    searchPlace(){
+      if(this.keyword){
+        this.placeSearch.search(this.keyword);
+      }
+    },
+    changeMainButtonToSelect(){
+      this.mainButtonBorderColor = 'limegreen';
+      this.mainButtonBgColor = '#fff';
+      this.mainButtonTextColor = '#000';
+      this.mainButtonText = '选择车位';
+    },
+    changeMainButtonToConfirm(){
+      this.mainButtonBorderColor = 'limegreen';
+      this.mainButtonBgColor = 'limegreen';
+      this.mainButtonTextColor = '#FFF';
+      this.mainButtonText = '确认选择';
     }
   }
 }
@@ -437,7 +441,8 @@ body{width:100%; height:100%;}
 .items-on-map{position: absolute; z-index: 10;}
 #main-box{width: 10rem;height: 2.1875rem; line-height: 2rem; bottom: 1.75rem; left: 50%; margin-left: -5rem; font-size: 0.9375rem; text-align: center; border: 2px solid;border-radius: 1.25rem;}
 #search-box{top: 1rem; left: 50%; width: 20rem; margin-left: -10rem;}
-#search-box #keyword{width: 100%; height: 2rem; font-size: 1rem;}
+#search-box #keyword{width: calc(80% - 4px); height: 2rem; font-size: 1rem;}
+#search-box button{width: calc(20% - 4px); height: 2rem; appearance:none; background-color: #fff;border-radius: 5px;position: relative; top: -2px;}
 #settings-box{bottom: 1.6rem; left: 1rem;}
 #settings-box img{width: 2rem; height: 2rem;}
 #geolocation-box{bottom: 1.7rem; right: 1rem;}

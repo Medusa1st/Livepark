@@ -1,5 +1,5 @@
 <template>
-    <div id="selectPlateNumber-box" class="items-on-map" v-bind:style="{zIndex: $parent.bubbleSelectParkingZIndex}" v-show="$parent.isSelectPlateNumberShow">
+    <div id="selectPlateNumber-box" class="items-on-map" v-bind:style="{zIndex: $parent.bubbleSelectParkingZIndex}">
       <div id="selectPlateNumber-box-title">
         <h3>选择车牌号</h3>
       </div>
@@ -39,7 +39,7 @@
           <button @click="cancelNewPlateNumber" class="inner-button">取消</button>
         </div>
           <div class="error-info" v-show="isErrorInfoShow">请输入正确的车牌号</div>
-          <button class="add-plate-number-button" @click="addNewPlateNumber">新增车牌</button>
+          <button class="add-plate-number-button" @click="addNewPlateNumber" v-show="!isNewPlateNumberShow">新增车牌</button>
           <hr>
         <p>当前使用车牌：</p>
         <div class="option-content" v-for="(item,index) of $parent.userPlateNumberList">
@@ -60,6 +60,7 @@
         isErrorInfoShow: false
       }
     },
+    props: ['myMessage'],
     methods:{
       addNewPlateNumber(){
         this.isNewPlateNumberShow = true;
@@ -111,7 +112,7 @@
   height: 2rem;
 }
 .user-content{
-  display: flex; justify-content: center; margin: 0.8rem 0.5rem 0.5rem;
+  display: flex; justify-content: center; margin: 0.5rem 0.5rem 1rem;
 }
 .error-info{
   color: red;

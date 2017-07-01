@@ -32,10 +32,10 @@
         alert('支付成功');
         this.isPaymentShow = false;
         if(this.onPrePayStatus){   
-          clearInterval(this.countDownInterval);
-          this.$router.push({
-            path: '/on-parking-status/' + this.$route.params.sn +'/'+ this.$route.params.pn
-          })
+          // clearInterval(this.countDownInterval);
+          this.$parent.isPayFinished = true;
+          this.$parent.toDoButtonName = '到达车位';
+          this.$parent.indicatedInfo = '请在以下时间内完成【到达车位】或【取消停车】操作，超时将自动取消停车。'
         }else if(this.onEndPayStatus){
           this.$router.push('/');
         }

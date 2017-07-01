@@ -1,7 +1,7 @@
 <template>
     
     <div id="cp-order">
-      <pay style=""></pay>
+      <pay></pay>
       <div class="page-title">
         <img class="backto-pic" src="../../assets/back-to-arrow.png" @click="backToPage">
         <p>{{ title }}</p>   
@@ -20,11 +20,12 @@
         <hr>
       </div>
       <div class="wait-user-operation">
-        <p>请在以下时间内完成【预付款停车】或【取消停车】操作，超时将自动取消停车。</p>
+        <p v-show="isPayFinished">{{aftePayInfo}}</p>
+        <p>{{indicatedInfo}}</p>
         <p>{{indicatedTime}}</p>
       </div>  
       <div class="ready-parking-buttons">
-            <div @click="startPark">预付款停车</div>
+            <div @click="startPark">{{toDoButtonName}}</div>
             <div @click="cancelPark">取消停车</div>
       </div>
     </div>
@@ -42,7 +43,12 @@ import Pay from '../pay/pay.vue'
                 actualWaitTime: 600000,
                 indicatedTime: '',
                 countDownInterval: null,
-                cost: '10.00'
+                cost: '10.00',
+                isPayFinished: false,
+                aftePayInfo: '您的预付款已支付成功!',
+                toDoButtonName: '预付款停车',
+                indicatedInfo: '请在以下时间内完成【预付款停车】或【取消停车】操作，超时将自动取消停车。',
+
             }
         },
         components: {
@@ -72,9 +78,21 @@ import Pay from '../pay/pay.vue'
             this.$router.push('/');
           },
           startPark: function(){
-            this.$children[0].isPaymentShow = true;
-            this.$children[0].onPrePayStatus = true;
-            this.$children[0].onEndPayStatus = false;
+            switch(this.toDoButtonName){
+              case '预付款停车':
+                this.$children[0].isPaymentShow = true;
+                this.$children[0].onPrePayStatus = true;
+                this.$children[0].onEndPayStatus = false;
+                break;
+              case '到达车位':
+                this.$router.push({
+                path: '/on-parking-status/' + this.$route.params.sn +'/'+ this.$route.params.pn});
+                break;
+            }
+
+
+
+
           },
           cancelPark: function(){
             this.$router.push({
@@ -95,13 +113,14 @@ import Pay from '../pay/pay.vue'
 
   .ready-parking-info{text-align: center;margin: 1rem 1rem 1rem;} 
   .info-title{font-size: 1.5rem; margin: 1rem auto; color: #000}
-  .info-name{font-size: 1rem; margin-top: 1rem; color: #888888}
+  .info-name{font-size: 1rem; margin-top: 0.5rem; color: #888888}
   .serial-number{font-size: 1.3rem; color: blue;font-weight: bold;}
-  .price-info{margin-top: 1rem;color: #888888;}
+  .price-info{margin-top: 0.5rem;color: #888888;}
 
-  .wait-user-operation{text-align: center;margin: 2rem 1rem;} 
-  .wait-user-operation p:nth-child(1){font-size: 1rem;margin: 1rem auto;}
-  .wait-user-operation p:nth-child(2){font-size: 3rem;margin: 1rem auto;}
+  .wait-user-operation{text-align: center;margin: 1.5rem 1rem;} 
+  .wait-user-operation p:nth-child(1){font-size: 1rem;margin: 1rem auto;color: green;font-weight: bold;}
+  .wait-user-operation p:nth-child(2){font-size: 1rem;margin: 1rem auto;}
+  .wait-user-operation p:nth-child(3){font-size: 3rem;margin: 1rem auto;}
   .ready-parking-buttons{display: flex; justify-content: space-between}
   .ready-parking-buttons div{width:10rem; height:3rem; margin: 0rem 1rem;text-align: center; line-height: 3rem;border-radius: 0.5rem;}
   .ready-parking-buttons div:nth-child(1){background-color: limegreen;color: #fff}

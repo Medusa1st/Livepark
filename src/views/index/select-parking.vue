@@ -1,5 +1,5 @@
 <template>
-    <div id="selectParking-box" class="items-on-map" v-bind:style="{zIndex: $parent.bubbleSelectParkingZIndex}" v-show="$parent.isSelectParkingShow">
+    <div id="selectParking-box" class="items-on-map" v-bind:style="{zIndex: $parent.bubbleSelectParkingZIndex}">
       <div id="selectParking-box-title">
         <h3>目的地信息</h3>
       </div>
