@@ -7,17 +7,17 @@
     <div class="profile-info-items">
       <div id="profile-info-photo">
         <p>头像</p>
-        <img src="../../assets/test-account-photo-1.jpg">
+        <img :src="$route.params.photoUrl">
       </div>
       <hr>
       <div id="profile-info-nickname">
         <p>昵称</p>
-        <p>城市乐泊</p>
+        <p>{{$route.params.userName}}</p>
       </div>
       <hr>
       <div id="profile-info-account">
-        <p>账号</p>
-        <p>LivePark</p>
+        <p>性别</p>
+        <p>{{$route.params.userSex}}</p>
       </div>
       <hr>
       <div id="profile-info-phonenumber">

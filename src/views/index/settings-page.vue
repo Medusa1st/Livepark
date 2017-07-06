@@ -1,7 +1,7 @@
 <template>
   <div id="settings-page" v-bind:style="{left: $parent.settingsPageStyleLeft}">
     <div class="profile-photo-box">
-      <img v-bind:src="$parent.profilePhotoPic" style="width:100%;height:100%;">
+      <img v-bind:src="$parent.profilePhotoUrl" style="width:100%;height:100%;">
     </div>
     <div class="settings-page-button" @click.stop="$parent.linkToProfile">
       <img class="indicated-pic-profile" v-bind:src="$parent.profilePic">

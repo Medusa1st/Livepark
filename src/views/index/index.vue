@@ -48,7 +48,7 @@ const aimCenter = require('../../assets/aim-center.png');
 const settings = require('../../assets/settings.png');
 const locating = require('../../assets/locating.png');
 // const profilePhoto = require('../../assets/profile-photo.png');
-const profilePhoto = require('../../assets/test-account-photo-1.jpg');
+const profilePhoto = require('../../assets/profile-photo.png');
 const profile = require('../../assets/profile.png');
 const record = require('../../assets/record.png');
 const goToArrow = require('../../assets/go-to-arrow.png');
@@ -67,7 +67,9 @@ export default {
       aimCenterPic: aimCenter,
       settingsBoxPic: settings,
       locatingPic: locating,
-      profilePhotoPic: profilePhoto,
+      userName: '',
+      userSex: '',
+      profilePhotoUrl: profilePhoto,
       profilePic: profile,
       recordPic: record,
       goToArrowPic: goToArrow,
@@ -119,6 +121,12 @@ export default {
     console.log('Vue of index mounted!');
 
     // promise es6
+    axios.get(`usrdata/${this.getCookie('user')}.json`).then(({ data }) => {
+      this.userSex = data.sex=='1'? '男':'女';
+      this.userName = data.nickName;
+      this.profilePhotoUrl = data.headImgUrl;
+    });
+
     axios.get('static/parking-info.json').then(({ data }) => {
       this.parkingInfoList = data;
       for (let i = 0; i < this.parkingInfoList.length; i++) {
@@ -347,7 +355,12 @@ export default {
     linkToProfile: function(){
       if(this.locatingInterval){clearInterval(this.locatingInterval);};
       this.$router.push({
-        path: '/profile'
+        name: 'Profile',
+        params: {
+          userSex: this.userSex,
+          userName: this.userName,
+          photoUrl: this.profilePhotoUrl
+        }
       })
     },
     linkToRecord: function(){
@@ -426,6 +439,14 @@ export default {
       this.mainButtonBgColor = 'limegreen';
       this.mainButtonTextColor = '#FFF';
       this.mainButtonText = '确认选择';
+    },
+    getCookie(name){
+      let arr,reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)");
+      if(arr=document.cookie.match(reg)){
+        return unescape(arr[2]);
+      }else{
+        return null;
+      }
     }
   }
 }
@@ -441,8 +462,8 @@ body{width:100%; height:100%;}
 .items-on-map{position: absolute; z-index: 10;}
 #main-box{width: 10rem;height: 2.1875rem; line-height: 2rem; bottom: 1.75rem; left: 50%; margin-left: -5rem; font-size: 0.9375rem; text-align: center; border: 2px solid;border-radius: 1.25rem;}
 #search-box{top: 1rem; left: 50%; width: 20rem; margin-left: -10rem;}
-#search-box #keyword{width: calc(80% - 4px); height: 2rem; font-size: 1rem;}
-#search-box button{width: calc(20% - 4px); height: 2rem; appearance:none; background-color: #fff;border-radius: 5px;position: relative; top: -2px;}
+#search-box #keyword{width: calc(80% - 5px); height: 2rem; font-size: 1rem;}
+#search-box button{width: calc(20% - 5px); height: 2rem; appearance:none; background-color: #fff;border-radius: 5px;position: relative; top: -2px;}
 #settings-box{bottom: 1.6rem; left: 1rem;}
 #settings-box img{width: 2rem; height: 2rem;}
 #geolocation-box{bottom: 1.7rem; right: 1rem;}
